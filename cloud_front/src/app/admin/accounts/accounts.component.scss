@@ -1,0 +1,24 @@
+.frame {
+  padding: 20px;
+  max-width: 65vw;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 50px;
+
+  .frame-footer {
+    margin-top: 15px;
+
+    button {
+      background-color: darkcyan;
+      color: white;
+    }
+  }
+
+  .table {
+    width: 100%;
+
+    tr {
+      text-align: left;
+    }
+  }
+}

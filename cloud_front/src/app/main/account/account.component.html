@@ -1,0 +1,29 @@
+<div id="center" class="text-center">
+  <div class="form frame darkModeAuto">
+    <h3>Votre compte</h3>
+
+    <!-- Nom d'utilisateur -->
+    <p>
+      <mat-form-field appearance="legacy" [floatLabel]="'always'">
+        <mat-label>Nom d'utilisateur</mat-label>
+        <input matInput type="text" [value]="this.user.username" readonly />
+      </mat-form-field>
+    </p>
+
+    <!-- Date création compte -->
+    <p>
+      <mat-form-field appearance="legacy" [floatLabel]="'always'">
+        <mat-label>Date création compte</mat-label>
+        <input matInput type="text" [value]="user.creationDate ? (user.creationDate | date: 'dd/MM/YYYY HH:mm:ss' : 'GMT') : 'Aucune'" readonly />
+      </mat-form-field>
+    </p>
+
+    <!-- Rôles -->
+    <p>
+      <mat-form-field appearance="legacy" [floatLabel]="'always'">
+        <mat-label>Rôles</mat-label>
+        <input matInput type="text" [value]="getRoles()" readonly />
+      </mat-form-field>
+    </p>
+  </div>
+</div>

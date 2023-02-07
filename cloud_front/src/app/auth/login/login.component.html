@@ -1,0 +1,31 @@
+<div id="center" class="auth-form frame darkModeAuto">
+  <h2>Connexion</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
+    <div class="auth-form-inputs auth-form-item">
+      <div class="auth-form-input">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        <mat-form-field>
+          <input matInput type="text" placeholder="Nom d'utilisateur" formControlName="username" required />
+        </mat-form-field>
+      </div>
+
+      <div class="auth-form-input">
+        <mat-icon aria-hidden="true">key</mat-icon>
+        <mat-form-field>
+          <mat-label>Mot de passe</mat-label>
+          <input matInput type="password" formControlName="password" required />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="auth-form-item">
+      <p>
+        <button mat-flat-button color="primary" type="submit" [disabled]="!loginForm.valid">Se connecter</button>
+      </p>
+      <p>
+        <small>Vous n'avez pas de compte ? <a routerLink="/register">S'enregistrer ici</a></small>
+      </p>
+    </div>
+  </form>
+</div>

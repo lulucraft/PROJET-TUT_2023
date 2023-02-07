@@ -1,0 +1,54 @@
+<div class="sidebar-left darkModeAuto" @fadeIn>
+  <!-- <mat-nav-list>
+    <a mat-list-item *ngIf="isAuthenticated()" (click)="conges()">
+      <mat-icon>work_off</mat-icon><span>Congés</span>
+    </a>
+  </mat-nav-list> -->
+
+  <ul class="sidebar-item">
+    <!-- Image compte visiteur -->
+    <li>
+      <!-- <a href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Smashicons - Flaticon</a> -->
+      <div *ngIf="!isAuthenticated()"><img src="assets/images/user.svg" width="24"><span style="vertical-align: bottom !important;">Visiteur</span></div>
+      <!-- <button mat-button *ngIf="isUserAdmin()"><mat-icon>account</mat-icon> Administrateur</button> -->
+      <button mat-button *ngIf="isAuthenticated()" (click)="account()"><img src="assets/images/user.svg" width="24"><span>{{getUserName()}}</span></button>
+    </li>
+
+    <!-- Admin Comptes -->
+    <li *ngIf="isAuthenticated() && isAdmin()">
+      <button mat-button (click)="adminComptes()">
+        <mat-icon>admin_panel_settings</mat-icon> Gestion Comptes
+      </button>
+    </li>
+
+    <!-- Congés -->
+    <li *ngIf="isAuthenticated()">
+      <button mat-button (click)="conges()">
+        <mat-icon>work_off</mat-icon> {{ isAdmin() ? 'Gestion congés' : 'Congés' }}
+      </button>
+    </li>
+
+    <!-- Admin Newsletter -->
+    <li *ngIf="isAuthenticated() && isAdmin()">
+      <button mat-button (click)="adminNewsletter()">
+        <mat-icon>email</mat-icon> Gestion Newsletter
+      </button>
+    </li>
+
+    <!-- Newsletter -->
+    <li *ngIf="isAuthenticated()">
+      <button mat-button (click)="newsletter()">
+        <mat-icon>email</mat-icon> Newsletter
+      </button>
+    </li>
+
+    <!-- Déconnexion -->
+    <li *ngIf="isAuthenticated()">
+      <button mat-button (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon> Déconnexion
+      </button>
+    </li>
+  </ul>
+</div>
+
+<div class="sidebar-close-background"></div>

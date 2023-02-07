@@ -1,0 +1,29 @@
+<header>
+  <div class="header-banner darkModeAuto">
+    <div class="header-item-left">
+      <!-- <img src="/assets/icons/menu_blanc.png" alt=""> -->
+      <div class="header-inline-item">
+        <button mat-icon-button (click)="openLeftMenu()">
+          <mat-icon style="color: white">menu</mat-icon>
+        </button>
+      </div>
+
+      <div class="header-inline-item">
+        <span class="header-item-brand"><a routerLink="/" style="text-decoration: none;color: inherit;">Cloud</a></span>
+      </div>
+    </div>
+
+    <div class="header-item-right">
+      <div class="header-inline-item">
+        <button mat-icon-button (click)="openSettingsMenu()">
+          <mat-icon style="color: white; font-size: 21px">settings</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-sidebar-left *ngIf="this.leftMenuOpened"></app-sidebar-left>
+
+  <app-sidebar-settings *ngIf="this.settingsMenuOpened"></app-sidebar-settings>
+</header>
+

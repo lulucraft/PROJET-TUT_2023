@@ -1,0 +1,15 @@
+.frame {
+  padding: 20px;
+  max-width: 65vw;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 50px;
+
+  .table {
+    width: 100%;
+
+    tr {
+      text-align: left;
+    }
+  }
+}

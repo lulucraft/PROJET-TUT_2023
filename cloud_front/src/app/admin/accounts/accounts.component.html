@@ -1,0 +1,64 @@
+<div class="text-center frame darkModeAuto">
+  <h3>Gestion des comptes employés</h3>
+
+  <div class="mat-elevation-z8">
+
+    <mat-table [dataSource]="users" class="table">
+
+      <!-- Id -->
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef>Id</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.id }}</mat-cell>
+      </ng-container>
+
+      <!-- Utilisateur -->
+      <ng-container matColumnDef="username">
+        <mat-header-cell *matHeaderCellDef>Utilisateur</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.username }}</mat-cell>
+      </ng-container>
+
+      <!-- Congés acquis -->
+      <ng-container matColumnDef="congesNbr">
+        <mat-header-cell *matHeaderCellDef>Congés acquis</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.congesNbr }}</mat-cell>
+      </ng-container>
+
+      <!-- Email -->
+      <!-- <ng-container matColumnDef="email">
+        <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.email }}</mat-cell>
+      </ng-container> -->
+
+      <!-- Statut -->
+      <ng-container matColumnDef="accountActive">
+        <mat-header-cell *matHeaderCellDef>Statut</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.accountActive ? 'Activé' : 'Désactivé' }}</mat-cell>
+      </ng-container>
+
+      <!-- Date création -->
+      <ng-container matColumnDef="creationDate">
+        <mat-header-cell *matHeaderCellDef>Date création</mat-header-cell>
+        <mat-cell *matCellDef="let user">{{ user.creationDate | date:'dd/MM/YYYY HH:mm:ss' }}</mat-cell>
+      </ng-container>
+
+      <!-- Bouton modification utilisateur -->
+      <ng-container matColumnDef="btn_edit">
+        <mat-header-cell *matHeaderCellDef style="max-width: 50px;width: 50px;"></mat-header-cell>
+        <mat-cell *matCellDef="let user" style="max-width: 50px;width: 50px;">
+          <!-- Delete line button (only if conge not accepted and no response given) -->
+          <button mat-mini-fab color="accent" (click)="editUser(user)" *ngIf="!isTheUser(user) && !isAdmin(user)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="columnsUsers"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: columnsUsers"></mat-row>
+    </mat-table>
+
+  </div>
+
+  <!-- <div class="frame-footer">
+    <button mat-flat-button (click)="addAccount()">Ajouter un compte</button>
+  </div> -->
+</div>

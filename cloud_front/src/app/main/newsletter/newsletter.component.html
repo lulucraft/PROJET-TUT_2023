@@ -1,0 +1,59 @@
+<div class="frame text-center darkModeAuto">
+
+  <div class="container-header">
+    <h2>Newsletter</h2>
+  </div>
+  <div class="container-content">
+    <!-- <div class="container-top-center">
+        <h1>container-top-center</h1>
+      </div> -->
+
+    <div class="container-top">
+      <div class="container-top-left">
+        <!-- <h1>container-top-left</h1> -->
+        <h2>Statistiques nouveaux embauchés</h2>
+        <div class="chart">
+          <!-- chart canvas stats -->
+          <canvas baseChart [data]="chartUsersData" [type]="chartType" [options]="chartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="container-top-right">
+        <h2>Statistiques de vente</h2>
+        <div class="chart">
+          <canvas baseChart [data]="chartSellData" [type]="chartType" [options]="chartOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-bottom">
+      <div class="container-bottom-left">
+        <h2>Nouveaux embauchés</h2>
+        <div class="mat-elevation-z8">
+          <mat-table [dataSource]="newUsers">
+            <!-- Utilisateur -->
+            <ng-container matColumnDef="username">
+              <mat-header-cell *matHeaderCellDef>Utilisateur</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{ user.username }}</mat-cell>
+            </ng-container>
+
+            <!-- Date -->
+            <ng-container matColumnDef="date">
+              <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{ user.creationDate | date: 'dd/MM/YYYY HH:MM' }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="columnsNewUsers"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columnsNewUsers"></mat-row>
+          </mat-table>
+        </div>
+      </div>
+
+      <div class="container-bottom-right" *ngIf="newsletterInfo">
+        <h2>{{ newsletterInfo.title }}</h2>
+        <p class="text">{{ newsletterInfo.text }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>

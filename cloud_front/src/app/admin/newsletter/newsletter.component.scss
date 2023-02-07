@@ -1,0 +1,15 @@
+.frame {
+  padding: 20px;
+  max-width: 65vw;
+  margin: auto;
+}
+
+p.sells {
+  > mat-form-field {
+    margin-right: 5px;
+  }
+
+  > mat-form-field:last-child {
+    margin-right: 0;
+  }
+}

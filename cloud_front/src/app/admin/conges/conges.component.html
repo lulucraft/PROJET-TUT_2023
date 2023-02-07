@@ -1,0 +1,80 @@
+<div class="text-center frame darkModeAuto">
+  <h3>Gestion des congés des utilisateurs</h3>
+
+  <!-- ADMIN table -->
+  <div style="position: relative;">
+    <h4>Demandes de congés {{filterNotValidated === 'all' ? '' : filter.triggerValue.toLowerCase()}} ({{congesRequestsNotValidated.data.length}})</h4>
+
+    <!-- Filter conges requests -->
+    <mat-form-field appearance="fill" style="position: absolute; right: 0; top: -12px; max-width: 130px;">
+      <mat-label>Tri demandes</mat-label>
+      <mat-select [(value)]="filterNotValidated" (selectionChange)="onSelectionChange($event)" #filter>
+        <mat-option value="all">Toutes</mat-option>
+        <mat-option value="inprogress">A valider</mat-option>
+        <mat-option value="validated">Validées</mat-option>
+        <mat-option value="invalidated">Refusées</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="mat-elevation-z8">
+
+      <mat-table [dataSource]="congesRequestsNotValidated" class="table">
+
+        <!-- Utilisateur -->
+        <ng-container matColumnDef="username">
+          <mat-header-cell *matHeaderCellDef>Utilisateur</mat-header-cell>
+          <mat-cell *matCellDef="let adConge">{{ adConge.username }}</mat-cell>
+        </ng-container>
+
+        <!-- Date création -->
+        <ng-container matColumnDef="creationDate">
+          <mat-header-cell *matHeaderCellDef>Date création</mat-header-cell>
+          <mat-cell *matCellDef="let adConge">{{ adConge.conge.creationDate | date:'dd/MM/YYYY HH:mm:ss' }}</mat-cell>
+        </ng-container>
+
+        <!-- Date début congé -->
+        <ng-container matColumnDef="startDate">
+          <mat-header-cell *matHeaderCellDef>Date début</mat-header-cell>
+          <mat-cell *matCellDef="let adConge">{{ adConge.conge.startDate | date: 'dd/MM/YYYY' }}</mat-cell>
+        </ng-container>
+
+        <!-- Date fin congé -->
+        <ng-container matColumnDef="endDate">
+          <mat-header-cell *matHeaderCellDef>Date fin</mat-header-cell>
+          <mat-cell *matCellDef="let adConge">{{ adConge.conge.endDate | date: 'dd/MM/YYYY' }}</mat-cell>
+        </ng-container>
+
+        <!-- Bouton validation conge -->
+        <ng-container matColumnDef="btn_edit">
+          <mat-header-cell *matHeaderCellDef style="max-width: 50px;width: 50px;"></mat-header-cell>
+          <mat-cell *matCellDef="let adConge" style="max-width: 50px;width: 50px;">
+            <!-- Line id -->
+            <!-- <span>{{ adConge.conge.id }}</span> -->
+            <!-- Delete line button (only if conge not accepted and no response given) -->
+            <button mat-mini-fab color="accent" (click)="validateConge(adConge)" *ngIf="!adConge.conge.validator">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="columnsCongesRequestsNotValidated"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: columnsCongesRequestsNotValidated"></mat-row>
+      </mat-table>
+
+      <!-- No row label -->
+      <div style="margin-top: 10px;" *ngIf="!congesRequestsNotValidated.data.length">
+        <div [ngSwitch]="filterNotValidated">
+          <div *ngSwitchCase="'inprogress'">Aucune demande de congés à valider</div>
+          <div *ngSwitchCase="'validated'">Aucune demande de congés validée</div>
+          <div *ngSwitchCase="'invalidated'">Aucune demande de congés refusée</div>
+          <div *ngSwitchDefault>Aucune demande de congés</div>
+        </div>
+      </div>
+      <mat-divider style="margin-top: 10px;" *ngIf="!congesRequestsNotValidated.data.length"></mat-divider>
+
+      <!-- Paginator -->
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" #paginator showFirstLastButtons></mat-paginator>
+    </div>
+
+  </div>
+</div>

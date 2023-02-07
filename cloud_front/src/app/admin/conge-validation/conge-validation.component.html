@@ -1,0 +1,43 @@
+<div id="center" class="text-center frame darkModeAuto">
+  <h3>Validation du congé</h3>
+
+  <form [formGroup]="congeValidationForm" (ngSubmit)="sendCongeValidation($event.submitter.id)">
+    <!-- Username -->
+    <p>
+      <mat-form-field matColumnDef="username">
+        <mat-label>Utilisateur</mat-label>
+        <input matInput [value]="adminConge!.username" readonly>
+      </mat-form-field>
+    </p>
+
+    <!-- Conge id -->
+    <p>
+      <mat-form-field matColumnDef="id">
+        <mat-label>Id congé</mat-label>
+        <input matInput [value]="adminConge!.conge.id" readonly>
+      </mat-form-field>
+    </p>
+
+    <!-- Date création -->
+    <p>
+      <mat-form-field matColumnDef="creationDate">
+        <mat-label>Date création</mat-label>
+        <input matInput [value]="adminConge!.conge.creationDate | date: 'dd/MM/YYYY HH:mm:ss'" readonly>
+      </mat-form-field>
+    </p>
+
+    <!-- Date début/Date fin -->
+    <p>
+      <mat-form-field>
+        <mat-date-range-input>
+          <input matStartDate formControlName="startDate" placeholder="Date début" readonly>
+          <input matEndDate formControlName="endDate" placeholder="Date fin" readonly>
+        </mat-date-range-input>
+      </mat-form-field>
+    </p>
+
+    <button mat-raised-button type="button" color="warn" (click)="back()" style="margin-right: 10px;">Retour</button>
+    <button mat-raised-button type="submit" color="info" id="validate" style="margin-right: 10px;">Valider congé</button>
+    <button mat-raised-button type="submit" color="info" id="refuse">Refuser congé</button>
+  </form>
+</div>

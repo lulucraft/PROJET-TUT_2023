@@ -1,0 +1,102 @@
+<div id="center" class="frame text-center darkModeAuto">
+  <h3>Modification Newsletter</h3>
+
+  <!-- TABS -->
+  <mat-tab-group>
+    <!-- Tab Newsletter INFOS -->
+    <mat-tab label="Infos">
+      <div class="frame darkModeAuto">
+        <form [formGroup]="formGroupInfos" (ngSubmit)="publishInfosNewsletter()">
+          <!-- Titre Newsletter -->
+          <p>
+            <mat-form-field>
+              <mat-label>Titre Newsletter</mat-label>
+              <input matInput type="text" formControlName="title" placeholder="Titre" required>
+            </mat-form-field>
+          </p>
+
+          <!-- Texte Newsletter -->
+          <p>
+            <mat-form-field>
+              <mat-label>Texte Newsletter</mat-label>
+              <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="5"
+                formControlName="text" placeholder="Texte Newsletter" required></textarea>
+            </mat-form-field>
+          </p>
+
+          <button mat-raised-button type="submit" color="info">Publier la Newsletter "Infos"</button>
+        </form>
+      </div>
+    </mat-tab>
+
+    <!-- Tab Newsletter SELLS -->
+    <mat-tab label="Statistiques ventes">
+      <div class="frame darkModeAuto">
+        <form [formGroup]="formGroupSells" (ngSubmit)="publishSellsNewsletter()">
+          <!-- Titre Newsletter -->
+          <p>
+            <mat-form-field>
+              <mat-label>Titre Newsletter</mat-label>
+              <input matInput type="text" formControlName="title" placeholder="Titre" required>
+            </mat-form-field>
+          </p>
+
+          <!-- Sells by month -->
+          <p class="sells">
+            <mat-form-field>
+              <mat-label>Ventes Janvier</mat-label>
+              <input matInput type="number" formControlName="january" placeholder="Janvier" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Février</mat-label>
+              <input matInput type="number" formControlName="february" placeholder="Février" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Mars</mat-label>
+              <input matInput type="number" formControlName="march" placeholder="Mars" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Avril</mat-label>
+              <input matInput type="number" formControlName="april" placeholder="Avril" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Mai</mat-label>
+              <input matInput type="number" formControlName="may" placeholder="Mai" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Juin</mat-label>
+              <input matInput type="number" formControlName="june" placeholder="Juin" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Juillet</mat-label>
+              <input matInput type="number" formControlName="july" placeholder="Juillet" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Août</mat-label>
+              <input matInput type="number" formControlName="august" placeholder="Août" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Septembre</mat-label>
+              <input matInput type="number" formControlName="september" placeholder="Septembre" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Octobre</mat-label>
+              <input matInput type="number" formControlName="october" placeholder="Octobre" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Novembre</mat-label>
+              <input matInput type="number" formControlName="november" placeholder="Novembre" required>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Ventes Décembre</mat-label>
+              <input matInput type="number" formControlName="december" placeholder="Décembre" required>
+            </mat-form-field>
+          </p>
+
+          <button mat-raised-button type="submit" color="info">Publier la Newsletter des ventes</button>
+        </form>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+</div>

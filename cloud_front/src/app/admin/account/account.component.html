@@ -1,0 +1,26 @@
+<div id="center" class="text-center frame darkModeAuto">
+  <h3>Modification du compte utilisateur</h3>
+
+  <form [formGroup]="accountForm" (ngSubmit)="editAccount()" *ngIf="user$ | async">
+    <p>
+      <mat-form-field>
+        <mat-label>Statut compte</mat-label>
+        <mat-select formControlName="accountActive" placeholder="Statut compte" type="number" required>
+          <mat-option value="true">Activé</mat-option>
+          <mat-option value="false">Désactivé</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </p>
+
+    <p>
+      <mat-form-field>
+        <mat-label>Congés acquis</mat-label>
+        <input matInput formControlName="congesNbr" placeholder="Congés acquis" type="number">
+      </mat-form-field>
+    </p>
+
+    <button mat-raised-button type="button" color="warn" (click)="back()" style="margin-right: 10px;">Retour</button>
+    <button mat-raised-button type="submit" color="info">Modifier l'utilisateur</button>
+  </form>
+
+</div>
