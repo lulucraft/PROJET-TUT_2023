@@ -13,7 +13,6 @@ import { AuthGuard } from './guard/auth.guard';
 import { Title } from '@angular/platform-browser';
 import { CongeValidationComponent } from './admin/conge-validation/conge-validation.component';
 import { NewsletterComponent } from './main/newsletter/newsletter.component';
-import { NewsletterComponent as AdminNewsletterComponent } from './admin/newsletter/newsletter.component';
 import { AdminComponent } from './admin/admin.component';
 import { AccountsComponent } from './admin/accounts/accounts.component';
 import { AccountComponent as AdminAccountComponent } from './admin/account/account.component';
@@ -52,7 +51,6 @@ const routes: Routes = [
       { path: 'account/:ID', component: AdminAccountComponent },
       { path: 'conges', component: AdminCongesComponent },
       { path: 'congevalidation', component: CongeValidationComponent },
-      { path: 'newsletter', component: AdminNewsletterComponent }
     ]
   },
   { path: 'login', component: LoginComponent },

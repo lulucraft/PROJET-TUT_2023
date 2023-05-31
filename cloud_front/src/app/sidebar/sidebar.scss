@@ -32,6 +32,11 @@
       span {
         vertical-align: middle;
       }
+
+      button {
+        width: 100%;
+        justify-content: flex-start !important;
+      }
     }
   }
 }

@@ -1,7 +1,6 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 // Plus imports for other components in your app.
 
 // Include the common styles for Angular Material. We include this here so that you only
@@ -12,7 +11,7 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$cloud-primary: mat.define-palette(mat.$blue-palette);//, 500
+$cloud-primary: mat.define-palette(mat.$blue-palette); //, 500
 $cloud-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 
 // The warn palette is optional (defaults to red).
@@ -20,26 +19,26 @@ $cloud-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$cloud-theme: mat.define-light-theme((
-  color: (
-    primary: $cloud-primary,
-    accent: $cloud-accent,
-    warn: $cloud-warn,
+$cloud-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $cloud-primary,
+      accent: $cloud-accent,
+      warn: $cloud-warn,
+    ),
   )
-));
+);
 
-$primary: map-get($cloud-primary, 'default');
+$primary: map-get($cloud-primary, "default");
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include mat.all-component-themes($cloud-theme);
 
-
 :root {
   --primary-color: #{$primary};
 }
-
 
 // DARK theme
 $cloud-dark-theme: mat.define-dark-theme(
@@ -57,20 +56,25 @@ $cloud-dark-theme: mat.define-dark-theme(
 }
 //
 
-
 // html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f3f3f3; position: relative; height: 100vh; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f3f3f3;
+  position: relative;
+  height: 100vh;
+  font-size: 0.92rem;
+}
 
 body.darkMode {
-  background-color: $primary;//#383838;
+  background-color: $primary; //#383838;
 
   div.darkModeAuto {
-    background-color: #2a2a2a;//#2a2a2a !important;
-    border-color: rgb(28 28 28 / 74%) !important;//#1a1a1a !important;
+    background-color: #2a2a2a; //#2a2a2a !important;
+    border-color: rgb(28 28 28 / 74%) !important; //#1a1a1a !important;
     color: white;
   }
 }
-
 
 * {
   box-sizing: border-box;
@@ -96,7 +100,7 @@ body.darkMode {
 
 .frame {
   background-color: #fbfbfb;
-  border-radius: 2px;
+  border-radius: 3px;
   -webkit-box-shadow: -1px 4px 20px -7px rgb(145 145 145);
   box-shadow: -1px 4px 20px -7px rgb(145 145 145);
 }

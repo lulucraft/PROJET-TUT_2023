@@ -1,0 +1,13 @@
+<div class="sidebar-right darkModeAuto" @fadeIn>
+  <ul class="sidebar-item">
+    <li>
+      <button mat-button>
+        <!-- <mat-icon>brightness_high</mat-icon> -->
+        <mat-slide-toggle (change)="changeDarkMode($event)" [checked]="toggleDarkMode">Thème sombre</mat-slide-toggle>
+        <!-- <mat-icon>bedtime</mat-icon> -->
+      </button>
+    </li>
+  </ul>
+</div>
+
+<div class="sidebar-close-background"></div>

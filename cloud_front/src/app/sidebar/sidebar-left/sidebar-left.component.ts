@@ -64,11 +64,6 @@ export class SidebarLeftComponent implements OnInit {
     this.router.navigate(['/main/newsletter']);
   }
 
-  adminNewsletter(): void {
-    this.appHeader.leftMenuOpened = false;
-    this.router.navigate(['/admin/newsletter']);
-  }
-
   adminComptes(): void {
     this.appHeader.leftMenuOpened = false;
     this.router.navigate(['/admin/accounts']);

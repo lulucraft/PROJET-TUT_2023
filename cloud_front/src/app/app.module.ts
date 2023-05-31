@@ -25,7 +25,6 @@ import { CongeValidationComponent } from './admin/conge-validation/conge-validat
 import { AdminComponent } from './admin/admin.component';
 import { CongesComponent as AdminCongesComponent } from './admin/conges/conges.component';
 import { NewsletterComponent } from './main/newsletter/newsletter.component';
-import { NewsletterComponent as AdminNewsletterComponent } from './admin/newsletter/newsletter.component';
 import { NgChartsModule } from 'ng2-charts';
 import localeFr from '@angular/common/locales/fr';
 import { AccountComponent as AdminAccountComponent } from './admin/account/account.component';
@@ -51,7 +50,6 @@ registerLocaleData(localeFr, 'fr-FR');
     AdminComponent,
     CongeValidationComponent,
     AdminCongesComponent,
-    AdminNewsletterComponent,
     AdminAccountComponent,
     AccountsComponent,
     RegisterComponent

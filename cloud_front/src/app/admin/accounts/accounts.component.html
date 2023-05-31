@@ -43,8 +43,8 @@
 
       <!-- Bouton modification utilisateur -->
       <ng-container matColumnDef="btn_edit">
-        <mat-header-cell *matHeaderCellDef style="max-width: 50px;width: 50px;"></mat-header-cell>
-        <mat-cell *matCellDef="let user" style="max-width: 50px;width: 50px;">
+        <mat-header-cell *matHeaderCellDef style="max-width: 65px;width: 65px;"></mat-header-cell>
+        <mat-cell *matCellDef="let user" style="max-width: 65px;width: 65px;">
           <!-- Delete line button (only if conge not accepted and no response given) -->
           <button mat-mini-fab color="accent" (click)="editUser(user)" *ngIf="!isTheUser(user) && !isAdmin(user)">
             <mat-icon>edit</mat-icon>

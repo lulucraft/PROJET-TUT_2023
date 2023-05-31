@@ -17,35 +17,32 @@
     <!-- Admin Comptes -->
     <li *ngIf="isAuthenticated() && isAdmin()">
       <button mat-button (click)="adminComptes()">
-        <mat-icon>admin_panel_settings</mat-icon> Gestion Comptes
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>Gestion Comptes</span>
       </button>
     </li>
 
     <!-- Congés -->
     <li *ngIf="isAuthenticated()">
       <button mat-button (click)="conges()">
-        <mat-icon>work_off</mat-icon> {{ isAdmin() ? 'Gestion congés' : 'Congés' }}
-      </button>
-    </li>
-
-    <!-- Admin Newsletter -->
-    <li *ngIf="isAuthenticated() && isAdmin()">
-      <button mat-button (click)="adminNewsletter()">
-        <mat-icon>email</mat-icon> Gestion Newsletter
+        <mat-icon>work_off</mat-icon>
+        <span>Mes fichiers</span>
       </button>
     </li>
 
     <!-- Newsletter -->
     <li *ngIf="isAuthenticated()">
       <button mat-button (click)="newsletter()">
-        <mat-icon>email</mat-icon> Newsletter
+        <mat-icon>email</mat-icon>
+        <span>Newsletter</span>
       </button>
     </li>
 
     <!-- Déconnexion -->
     <li *ngIf="isAuthenticated()">
       <button mat-button (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon> Déconnexion
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Déconnexion</span>
       </button>
     </li>
   </ul>

@@ -5,16 +5,16 @@
     <div class="auth-form-inputs auth-form-item">
       <!-- Nom d'utilisateur -->
       <div class="auth-form-input">
-        <mat-icon aria-hidden="true">account_circle</mat-icon>
         <mat-form-field>
+          <mat-icon aria-hidden="true" matIconPrefix>account_circle</mat-icon>
           <input matInput type="text" placeholder="Nom d'utilisateur" formControlName="username" required />
         </mat-form-field>
       </div>
 
       <!-- Mot de passe -->
       <div class="auth-form-input">
-        <mat-icon aria-hidden="true">key</mat-icon>
         <mat-form-field>
+          <mat-icon aria-hidden="true" matIconPrefix>key</mat-icon>
           <mat-label>Mot de passe</mat-label>
           <input matInput type="password" formControlName="password" required />
         </mat-form-field>
@@ -22,8 +22,8 @@
 
       <!-- Confirmer mot de passe -->
       <div class="auth-form-input">
-        <mat-icon aria-hidden="true">void</mat-icon>
         <mat-form-field>
+          <mat-icon aria-hidden="true" matIconPrefix>void</mat-icon>
           <mat-label>Confirmer mot de passe</mat-label>
           <input matInput type="password" formControlName="confirmPassword" required />
         </mat-form-field>

@@ -8,10 +8,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>fr.nepta</groupId>
-	<artifactId>Intranet</artifactId>
+	<artifactId>cloud</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>Cloud</name>
-	<description>Intranet back-end JAVA</description>
+	<description>Cloud back-end JAVA</description>
 	<properties>
 		<java.version>18</java.version>
 	</properties>

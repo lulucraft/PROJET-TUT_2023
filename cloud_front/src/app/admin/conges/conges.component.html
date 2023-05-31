@@ -1,12 +1,12 @@
 <div class="text-center frame darkModeAuto">
-  <h3>Gestion des congés des utilisateurs</h3>
+  <h3>Mes fichiers</h3>
 
   <!-- ADMIN table -->
   <div style="position: relative;">
     <h4>Demandes de congés {{filterNotValidated === 'all' ? '' : filter.triggerValue.toLowerCase()}} ({{congesRequestsNotValidated.data.length}})</h4>
 
     <!-- Filter conges requests -->
-    <mat-form-field appearance="fill" style="position: absolute; right: 0; top: -12px; max-width: 130px;">
+    <mat-form-field appearance="fill" style="position: absolute; right: 0; top: -16px; max-width: 130px;">
       <mat-label>Tri demandes</mat-label>
       <mat-select [(value)]="filterNotValidated" (selectionChange)="onSelectionChange($event)" #filter>
         <mat-option value="all">Toutes</mat-option>
@@ -46,8 +46,8 @@
 
         <!-- Bouton validation conge -->
         <ng-container matColumnDef="btn_edit">
-          <mat-header-cell *matHeaderCellDef style="max-width: 50px;width: 50px;"></mat-header-cell>
-          <mat-cell *matCellDef="let adConge" style="max-width: 50px;width: 50px;">
+          <mat-header-cell *matHeaderCellDef style="max-width: 65px;width: 65px;"></mat-header-cell>
+          <mat-cell *matCellDef="let adConge" style="max-width: 65px;width: 65px;">
             <!-- Line id -->
             <!-- <span>{{ adConge.conge.id }}</span> -->
             <!-- Delete line button (only if conge not accepted and no response given) -->

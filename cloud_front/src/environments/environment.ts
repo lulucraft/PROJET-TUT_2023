@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
-  // apiRoot: "https://back.intranet.tracroute.lan:444/"
-  apiRoot: "https://localhost:8080/"
+  apiRoot: "https://back.intranet.tracroute.lan:444/"
+  // apiRoot: "https://localhost:8080/"
+  // apiRoot: "https://localhost:443/"
 };
 
 /*

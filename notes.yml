@@ -1,0 +1,29 @@
+Analyse cloud :
+- Front :
+    - Page inscription
+    - Page connexion
+    - (Page mdp oublié)
+    - Page choix offre (pro ou standard) :
+        - Paiement PayPal ??
+    - Page principale avec dashboard (espace utilisé, nombre de fichiers/dossiers)
+    - Page liste fichiers :
+        - Partage fichier (avec lien + espace utilisateur)
+        - Téléchargement fichier
+        - Affichage fichier (si format pris en charge)
+        - Bouton ajout d'un fichier/dossier (+ possibilité drag and drop) :
+            - Choix de la durée de conservation du fichier
+    - Page/popup détails fichier avec preview
+    - Page détails profil utilisateur (infos, dark theme, modif mdp, image profil, nom, prénom, offre achetée, rôle...)
+- Back :
+    - Droits utilisateurs
+    - Suppression auto du fichier ?
+    - Archivage de 5 fichiers max avec fichier source toujours dispo (ou les 2 premiers ??)
+
+
+
+Notes :
+- Gérer les accès concurrents aux fichiers
+- Stocker les fichiers dans la BDD (hash, ...) :
+    -> si modif du fichier sur le serveur fichier... -> hash devient différent de la BDD -> serveur de fichier piraté ??
+- Utilisateur qui ne peut que lire et insérer dans la BDD -> la modification des fichiers ne se fait qu'en ajoutant
+    une nouvelle ligne d'historique dans la BDD
