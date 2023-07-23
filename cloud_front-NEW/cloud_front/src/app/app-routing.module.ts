@@ -9,6 +9,7 @@ import { AccountComponent } from './views/main/account/account.component';
 import { RegisterComponent } from './shared/auth/register/register.component';
 import { LoginComponent } from './shared/auth/login/login.component';
 import { FilesComponent } from './views/main/files/files.component';
+import { PricingComponent } from './shared/pricing/pricing.component';
 
 @Injectable({ providedIn: 'root' })
 export class TemplatePageTitleStrategy extends TitleStrategy {
@@ -34,6 +35,8 @@ const routes: Routes = [
       { path: 'files', component: FilesComponent }
     ]
   },
+
+  { path: 'pricing', component: PricingComponent },
 
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

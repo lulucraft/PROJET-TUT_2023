@@ -22,6 +22,7 @@ import { HomeComponent } from './shared/home/home.component';
 import { MainComponent } from './views/main/main.component';
 import { AccountComponent } from './views/main/account/account.component';
 import { FilesComponent } from './views/main/files/files.component';
+import { PricingComponent } from './shared/pricing/pricing.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -40,7 +41,8 @@ registerLocaleData(localeFr, 'fr-FR');
     MainComponent,
     AccountComponent,
 
-    FilesComponent
+    FilesComponent,
+     PricingComponent
   ],
   imports: [
     BrowserModule,

@@ -12,13 +12,13 @@ import { DataService } from './services/data.service';
 export class AppComponent implements OnInit {
 
   // Dark theme by défault
-  private darkModeEnabled: boolean = true;
+  private darkModeEnabled: boolean = false;
 
   constructor(private renderer: Renderer2, private authService: AuthService, private router: Router, private dataService: DataService) { }
 
   ngOnInit(): void {
     // Dark theme by défault
-    this.initDarkMode(true);
+    // this.initDarkMode(true);
 
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);

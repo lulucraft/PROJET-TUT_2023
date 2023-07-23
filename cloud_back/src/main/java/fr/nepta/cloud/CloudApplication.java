@@ -11,11 +11,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import fr.nepta.cloud.model.Conge;
-import fr.nepta.cloud.model.Newsletter;
+import fr.nepta.cloud.model.File;
+import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
-import fr.nepta.cloud.service.NewsletterService;
+import fr.nepta.cloud.service.FileService;
 import fr.nepta.cloud.service.RoleService;
 import fr.nepta.cloud.service.UserService;
 
@@ -35,7 +35,7 @@ public class CloudApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(UserService us, RoleService rs, NewsletterService ns) {
+	CommandLineRunner run(UserService us, RoleService rs, FileService ns) {
 		return args -> {
 			// ROLES
 			if (rs.getRole("USER") == null) {
@@ -47,25 +47,27 @@ public class CloudApplication {
 
 			// Create default users
 			if (us.getUser("admin") == null) {
-				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), 0, true, true, new ArrayList<Role>(), new ArrayList<Conge>()));
+				Offer offer = null;
+				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), true, true, offer, new ArrayList<Role>(), new ArrayList<File>()));
 			}
 			if (!us.getUser("admin").getRoles().contains(rs.getRole("ADMIN"))) {
 				us.addRoleToUser("admin", "ADMIN");
 			}
 
 			if (us.getUser("user") == null) {
-				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), 2, true, true, new ArrayList<Role>(), new ArrayList<Conge>()));
+				Offer offer = null;
+				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), true, true, offer, new ArrayList<Role>(), new ArrayList<File>()));
 			}
 			if (!us.getUser("user").getRoles().contains(rs.getRole("USER"))) {
 				us.addRoleToUser("user", "USER");
 			}
 
 			// NEWSLETTER
-			if (ns.getNewsletter("INFOS") == null) {
-				ns.saveNewsletter(new Newsletter(null, "Loi montagne", "Pour limiter les embouteillages sur les routes dans les régions montagneuses et améliorer la sécurité des usagers, il faudra équiper sa voiture de pneus hiver ou détenir des chaînes dans son coffre en période hivernale dans certaines communes. L'obligation entrera en vigueur au 1er novembre 2021. Quels sont les véhicules et les départements concernés ? Chaînes, pneus hiver, pneus cloutés ou à crampons, quels sont les équipements obligatoires ? Prise en application de la loi Montagne II du 28 décembre 2016, le décret est paru au Journal officiel le 18 octobre 2020.", "INFOS"));
+			if (ns.getFile("test") == null) {
+				ns.saveFile(new File(null, "Fichier1", null, new Date()));
 			}
-			if (ns.getNewsletter("SELLS") == null) {
-				ns.saveNewsletter(new Newsletter(null, "Newsletter ventes", "0, 1", "SELLS"));
+			if (ns.getFile("SELLS") == null) {
+				ns.saveFile(new File(null, "Fichier2", null, new Date()));
 			}
 		};
 	}

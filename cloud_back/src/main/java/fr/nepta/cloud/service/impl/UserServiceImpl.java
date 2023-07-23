@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.nepta.cloud.model.Conge;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.repository.RoleRepo;
@@ -141,7 +140,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		if (user.getFirstname() != null) u.setFirstname(user.getFirstname());
 		if (user.getLastname() != null) u.setLastname(user.getLastname());
 		if (user.getEmail() != null) u.setEmail(user.getEmail());
-		if (user.getCongesNbr() >= 0) u.setCongesNbr(user.getCongesNbr());
+//		if (user.getCongesNbr() >= 0) u.setCongesNbr(user.getCongesNbr());
 		u.setAccountActive(user.isAccountActive());
 
 		log.info("User '{}' updated", u.getId());

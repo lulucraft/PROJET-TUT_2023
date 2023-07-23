@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
 import { AuthService } from './auth.service';
+import { File } from '../models/file';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,10 @@ export class DataService {
 
   setDarkMode(darkMode: boolean): Observable<any> {
     return this.http.post(this.apiBaseUrl + 'api/user/darkmode', darkMode);
+  }
+
+  downloadFile(file: File) {
+    this.downloadFileFromData(file.data);
   }
 
 
@@ -45,5 +50,12 @@ export class DataService {
 
   editUser(user: User): Observable<any> {
     return this.http.post(this.apiBaseUrl + 'api/admin/edituser', user);
+  }
+
+
+  downloadFileFromData(data: BlobPart) {
+    const blob = new Blob([data]);//, { type: 'text/csv' }
+    const url= window.URL.createObjectURL(blob);
+    window.open(url);
   }
 }

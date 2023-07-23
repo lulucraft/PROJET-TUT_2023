@@ -13,6 +13,12 @@
       </div>
     </div>
 
+    <div class="header-item-center">
+      <div class="header-inline-item">
+        <a mat-button routerLink="/pricing" style="line-height: 0;">Nos tarifs</a>
+      </div>
+    </div>
+
     <div class="header-item-right">
       <div class="header-inline-item">
         <button mat-icon-button (click)="openSettingsMenu()">
@@ -26,4 +32,3 @@
 
   <app-sidebar-settings *ngIf="this.settingsMenuOpened"></app-sidebar-settings>
 </header>
-

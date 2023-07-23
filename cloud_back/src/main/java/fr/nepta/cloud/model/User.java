@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,9 +49,6 @@ public class User implements Cloneable {
 	@DateTimeFormat(pattern = "dd-MM-yyyy HH:mm")
 	private Date creationDate;
 
-	@Column(name = "congesnbr", nullable = false)
-	private double congesNbr;
-
 	@Column(name = "darkmode", nullable = false, columnDefinition="tinyint(1) default 1")
 	private boolean darkModeEnabled;
 
@@ -63,11 +61,14 @@ public class User implements Cloneable {
 	//	@Column(name = "refresh_token")
 	//	private String refreshToken;
 
+	@OneToOne
+	private Offer offer;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	private Collection<Role> roles = new ArrayList<>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	private Collection<Conge> conges = new ArrayList<>();
+	private Collection<File> files = new ArrayList<>();
 
 	@Override
 	public User clone() throws CloneNotSupportedException {

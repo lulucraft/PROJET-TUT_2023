@@ -18,28 +18,22 @@ import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Getter
 @Entity
-@Table(name = "conge")
-public class Conge {
+@Table(name = "file")
+public class File {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "name")
+	private String name;
+
 	@Column(name = "creationdate", nullable = false)
 	@DateTimeFormat(pattern = "dd-MM-yyyy HH:mm")
 	private Date creationDate;
 
-	@Column(name = "startdate", nullable = false)
+	@Column(name = "modificationdate", nullable = false)
 	@DateTimeFormat(pattern = "dd-MM-yyyy HH:mm")
 	private Date startDate;
-
-	@Column(name = "enddate", nullable = false)
-	private Date endDate;
-
-	@Column(name = "validated", nullable = false)
-	private boolean validated;
-
-	@Column(name = "validator", nullable = true)
-	private String validator;
 
 }

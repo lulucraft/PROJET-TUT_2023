@@ -1,29 +1,93 @@
 <div class="text-center frame darkModeAuto">
+  <nav class="breadcrumb">
+    <ol>
+      <li><mat-icon>home</mat-icon>Accueil</li>
+      <li><mat-icon>arrow_right</mat-icon></li>
+      <li><mat-icon>list</mat-icon>Fichiers</li>
+    </ol>
+  </nav>
+
   <div>
     <h3>Vos fichiers</h3>
 
-    <table mat-table [dataSource]="filesCpt" class="mat-elevation-z8 table">
-      <!-- Date de création -->
+    <table mat-table [dataSource]="filesDataSource" class="table">
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef style="width: 120px;">
+          <!-- Checkbox de selection de toutes les ligne -->
+          <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+          <!-- Bouton 3 points affichage actions -->
+          <button mat-icon-button *ngIf="selection.hasValue()" (click)="showActions(selection)"
+            [matMenuTriggerFor]="actionsMenu" style="vertical-align: middle;">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
+          <mat-menu #actionsMenu="matMenu">
+            <button mat-menu-item (click)="downloadFiles(selection)">
+              <mat-icon matBadge="15" matBadgeColor="accent" matBadgeSize="small">download</mat-icon>Télécharger
+            </button>
+            <button mat-menu-item>
+              <mat-icon matBadge="15" matBadgeColor="warn" matBadgeSize="small">delete</mat-icon>Supprimer
+            </button>
+          </mat-menu>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <!-- Checkbox de selection de la ligne -->
+          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Nom -->
       <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef>Nom</th>
+        <td mat-cell *matCellDef="let file">{{ file.name }}</td>
+        <!-- <td mat-footer-cell *matFooterCellDef>restant</td> -->
+      </ng-container>
+
+      <!-- Date de création -->
+      <ng-container matColumnDef="credate">
         <th mat-header-cell *matHeaderCellDef>Date de création</th>
-        <td mat-cell *matCellDef="let file">{{ file.creationDate }}</td>
-        <td mat-footer-cell *matFooterCellDef>restant</td>
+        <td mat-cell *matCellDef="let file">{{ file.creationDate | date: 'short' }}</td>
+        <!-- <td mat-footer-cell *matFooterCellDef>restant</td> -->
       </ng-container>
 
       <!-- Date de modification -->
-      <ng-container matColumnDef="nbr">
+      <ng-container matColumnDef="editdate">
         <th mat-header-cell *matHeaderCellDef>Date de modification</th>
-        <td mat-cell *matCellDef="let file">{{ file.editDate }}</td>
+        <td mat-cell *matCellDef="let file">{{ file.modificationDate | date: 'medium' }}</td>
+      </ng-container>
+
+      <!-- Download button -->
+      <ng-container matColumnDef="btn_download" style="max-width: 65px;width: 65px;">
+        <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
+        <td mat-cell *matCellDef="let file">
+          <button mat-mini-fab color="primary" (click)="downloadFile(file)">
+            <mat-icon>download</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Delete button -->
+      <ng-container matColumnDef="btn_del" style="max-width: 65px;width: 65px;">
+        <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
+        <td mat-cell *matCellDef="let file">
+          <button mat-mini-fab color="warn" (click)="deleteFile(file)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+      <!-- <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr> -->
     </table>
 
   </div>
 
-  <mat-divider style="margin: 15px 0;"></mat-divider>
+  <!-- <mat-divider style="margin: 15px 0;"></mat-divider> -->
 
   <!-- USER table -->
   <!-- <div style="position: relative;" *ngIf="!isAdmin()">
@@ -41,8 +105,8 @@
         <mat-header-cell *matHeaderCellDef style="max-width: 65px;width: 65px;"></mat-header-cell>
         <mat-cell *matCellDef="let file" style="max-width: 65px;width: 65px;">
           <!-- Line id -->
-          <!-- <span style="display: none;" #fileId>{{ file.id }}</span> -->
-          <!-- Delete line button -->
+  <!-- <span style="display: none;" #fileId>{{ file.id }}</span> -->
+  <!-- Delete line button -->
   <!--        <button mat-mini-fab color="warn" (click)="deleteFile(file.id)"
             *ngIf="!file.validated && !file.validator">
             <mat-icon>delete</mat-icon>

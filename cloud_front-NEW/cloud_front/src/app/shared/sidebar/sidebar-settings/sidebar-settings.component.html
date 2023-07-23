@@ -3,7 +3,9 @@
     <li>
       <button mat-button>
         <!-- <mat-icon>brightness_high</mat-icon> -->
-        <mat-slide-toggle (change)="changeDarkMode($event)" [checked]="toggleDarkMode">Thème sombre</mat-slide-toggle>
+        <mat-slide-toggle (change)="changeDarkMode($event)" [checked]="toggleDarkMode">
+          <span style="cursor: pointer;">Thème sombre</span>
+        </mat-slide-toggle>
         <!-- <mat-icon>bedtime</mat-icon> -->
       </button>
     </li>

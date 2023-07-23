@@ -21,7 +21,7 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$cloud_front-primary: mat.define-palette(mat.$blue-palette);
+$cloud_front-primary: mat.define-palette(mat.$purple-palette);
 $cloud_front-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 
 // The warn palette is optional (defaults to red).
@@ -66,7 +66,7 @@ $primary: map-get($cloud_front-primary, "default");
 
 :root {
   --primary-color: #{$primary};
-  --mdc-theme-text-primary-on-background: white;
+  --mdc-theme-text-primary-on-background: black;
 }
 
 html,
@@ -85,7 +85,7 @@ body.darkMode {
   background-color: $primary; //#383838;
 
   div.darkModeAuto {
-    background-color: #2a2a2a; //#2a2a2a !important;
+    background-color: #000000d9; //#2a2a2ad1; //#2a2a2a !important;
     border-color: rgb(28 28 28 / 74%) !important; //#1a1a1a !important;
     color: white;
   }
@@ -112,7 +112,7 @@ body.darkMode {
 
 .frame {
   background-color: #fbfbfb;
-  border-radius: 3px;
+  border-radius: 2px;
   -webkit-box-shadow: -1px 4px 20px -7px rgb(145 145 145);
   box-shadow: -1px 4px 20px -7px rgb(145 145 145);
 }
@@ -124,4 +124,26 @@ body.darkMode {
 
 .warn {
   color: #f44336 !important;
+}
+
+
+// Redef material styles
+.mdc-fab--mini {
+  height: 35px !important;
+  width: 35px !important;
+}
+
+.mat-mdc-table thead {
+  background-color: #2d2d2d;//rgba(233, 233, 233, 0.37);
+}
+
+// Fix badge not showing
+mat-icon {
+  .mat-badge-content {
+    font: initial !important;
+    font-size: 0.5em !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
