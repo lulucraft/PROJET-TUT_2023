@@ -2,6 +2,7 @@ package fr.nepta.cloud.service.impl;
 
 import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,30 +17,31 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class FileServiceImpl implements FileService {
 
-	private final FileRepo fileRepo;
+	@Autowired
+	private FileRepo fileRepo;
 
 	@Override
 	public File saveFile(File file) {
-		log.info("Saving Newsletter to the database");
+		log.info("Saving file to the database");
 		return fileRepo.save(file);
 	}
 
 	@Override
 	public Collection<File> getFiles() {
-		log.info("Fetching Newsletters from the database");
+		log.info("Fetching files from the database");
 		return fileRepo.findAll();
 	}
 
 	@Override
-	public File getFile(String fileName) {
-		for (File f : fileRepo.findAll()) {
-			if (f.getName().equalsIgnoreCase(fileName)) {
-				return f;
-			}
-		}
-
-		log.info("Fetching file '{}'", fileName);
-		return null;
+	public File getFile(long id) {
+		log.info("Fetching file '{}'", id);
+		return fileRepo.findById(id).get();
+	}
+	
+	@Override
+	public File getFile(String name) {
+		log.info("Fetching file '{}'", name);
+		return fileRepo.findByName(name);
 	}
 
 }

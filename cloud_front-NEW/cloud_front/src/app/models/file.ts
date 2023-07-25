@@ -1,6 +1,8 @@
 export interface File {
+  id?: number;
   name: string;
   creationDate: Date;
-  modificationDate: Date;
-  data: BlobPart;
+  modificationDate?: Date;
+  size: number;
+  hash?: string;
 }

@@ -9,11 +9,11 @@
       </div>
 
       <div class="header-inline-item">
-        <span class="header-item-brand"><a routerLink="/" style="text-decoration: none;color: inherit;">Cloud</a></span>
+        <span class="header-item-brand"><a routerLink="/" style="text-decoration: none;color: inherit;">Tuxit Cloud</a></span>
       </div>
     </div>
 
-    <div class="header-item-center">
+    <div class="header-item-center" *ngIf="!hasOffer()">
       <div class="header-inline-item">
         <a mat-button routerLink="/pricing" style="line-height: 0;">Nos tarifs</a>
       </div>

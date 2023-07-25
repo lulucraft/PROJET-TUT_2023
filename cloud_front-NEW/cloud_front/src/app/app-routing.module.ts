@@ -10,6 +10,8 @@ import { RegisterComponent } from './shared/auth/register/register.component';
 import { LoginComponent } from './shared/auth/login/login.component';
 import { FilesComponent } from './views/main/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
+import { CheckoutComponent } from './checkout/checkout.component';
+import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
 
 @Injectable({ providedIn: 'root' })
 export class TemplatePageTitleStrategy extends TitleStrategy {
@@ -20,7 +22,7 @@ export class TemplatePageTitleStrategy extends TitleStrategy {
   override updateTitle(routerState: RouterStateSnapshot) {
     const split = routerState.url.split('/');
     // Title is set from the last url element
-    this.title.setTitle(`Cloud | ${split[split.length - 1]}`);
+    this.title.setTitle(`Tuxit Cloud | ${split[split.length - 1]}`);
   }
 }
 
@@ -38,8 +40,11 @@ const routes: Routes = [
 
   { path: 'pricing', component: PricingComponent },
 
+  { path: 'checkout/:id', component: CheckoutComponent },
+
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
 
   { path: 'account', redirectTo: 'main/account' },
 

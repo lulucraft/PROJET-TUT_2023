@@ -25,10 +25,10 @@
           </button>
           <mat-menu #actionsMenu="matMenu">
             <button mat-menu-item (click)="downloadFiles(selection)">
-              <mat-icon matBadge="15" matBadgeColor="accent" matBadgeSize="small">download</mat-icon>Télécharger
+              <mat-icon color="primary" [matBadge]="selection.selected.length" matBadgeColor="primary" matBadgeSize="small">download</mat-icon>Télécharger
             </button>
             <button mat-menu-item>
-              <mat-icon matBadge="15" matBadgeColor="warn" matBadgeSize="small">delete</mat-icon>Supprimer
+              <mat-icon color="warn" [matBadge]="selection.selected.length" matBadgeColor="warn" matBadgeSize="small">delete</mat-icon>Supprimer
             </button>
           </mat-menu>
         </th>
@@ -38,13 +38,22 @@
             [checked]="selection.isSelected(row)">
           </mat-checkbox>
         </td>
+        <!-- Empty footer column -->
+        <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
 
       <!-- Nom -->
       <ng-container matColumnDef="label">
         <th mat-header-cell *matHeaderCellDef>Nom</th>
         <td mat-cell *matCellDef="let file">{{ file.name }}</td>
-        <!-- <td mat-footer-cell *matFooterCellDef>restant</td> -->
+
+        <td mat-footer-cell *matFooterCellDef>
+          <input hidden type="file" (change)="addFile($event)" multiple="multiple" enctype='multipart/form-data' #fileInput>
+          <button mat-raised-button color="primary" (click)="fileInput.click()">
+            <mat-icon>add</mat-icon>Ajouter un fichier
+          </button>
+          <span *ngIf="fileInput.files && fileInput.files.length" style="margin-left: 10px;">{{ fileInput.files[0].name + (fileInput.files.length > 1 ? '...' : '') }}</span>
+        </td>
       </ng-container>
 
       <!-- Date de création -->
@@ -80,9 +89,18 @@
         </td>
       </ng-container>
 
+      <!-- Add line button -->
+      <!-- <ng-container matColumnDef="add_file">
+        <th mat-footer-cell *matFooterCellDef></th>
+        <td mat-footer-cell>
+          <button mat-flat-button>Ajouter un fichier</button>
+        </td>
+      </ng-container> -->
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       <!-- <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr> -->
+      <tr mat-footer-row *matFooterRowDef="['select', 'label']"></tr>
     </table>
 
   </div>

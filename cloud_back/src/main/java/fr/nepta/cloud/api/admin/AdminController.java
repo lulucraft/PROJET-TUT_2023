@@ -2,8 +2,6 @@ package fr.nepta.cloud.api.admin;
 
 import java.util.Collection;
 
-import javax.annotation.security.RolesAllowed;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.nepta.cloud.model.Newsletter;
 import fr.nepta.cloud.model.User;
-import fr.nepta.cloud.service.FileService;
-import fr.nepta.cloud.service.RoleService;
 import fr.nepta.cloud.service.UserService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -30,10 +26,10 @@ public class AdminController {
 
 	@Autowired
 	private final UserService us;
-	@Autowired
-	private final RoleService rs;
-	@Autowired
-	private final FileService ns;
+//	@Autowired
+//	private final RoleService rs;
+//	@Autowired
+//	private final FileService ns;
 
 	@RolesAllowed("ADMIN")
 	@GetMapping(value = "users")

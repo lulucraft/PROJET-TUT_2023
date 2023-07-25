@@ -25,9 +25,12 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    if (this.authService.currentUserValue!.darkModeEnabled === false) {
-      this.initDarkMode(false);
-    }
+    // if (this.authService.currentUserValue!.darkModeEnabled === false) {
+    //   this.initDarkMode(false);
+    // } else {
+    if (this.authService.currentUserValue!.darkModeEnabled)
+      this.initDarkMode(this.authService.currentUserValue!.darkModeEnabled);
+    // }
   }
 
   changeDarkMode(darkModeEnabled: boolean): void {

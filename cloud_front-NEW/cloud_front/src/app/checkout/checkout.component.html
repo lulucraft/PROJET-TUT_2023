@@ -1,0 +1,77 @@
+<div class="checkout text-center" *ngIf="offer">
+  <mat-stepper linear="true" #stepper>
+    <!-- Step 1 -->
+    <mat-step [stepControl]="firstFormGroup" label="Entrez l'adresse de livraison">
+      <ng-template matStepLabel>Livraison</ng-template>
+      <form [formGroup]="firstFormGroup">
+        <p class="form-item-group">
+          <!-- Nom -->
+          <mat-form-field appearance="fill">
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="lastnameCtrl" placeholder="Nom" required>
+          </mat-form-field>
+          <!-- Prénom -->
+          <mat-form-field appearance="fill">
+            <mat-label>Prénom</mat-label>
+            <input matInput formControlName="nameCtrl" placeholder="Prénom" required>
+          </mat-form-field>
+        </p>
+
+        <p class="form-item-group">
+          <!-- Adresse -->
+          <mat-form-field appearance="fill">
+            <mat-label>Adresse</mat-label>
+            <input matInput formControlName="addressCtrl" placeholder="Ex : 1 rue Paul Michel" required>
+          </mat-form-field>
+          <!-- Code postal -->
+          <mat-form-field appearance="fill">
+            <mat-label>Code postal</mat-label>
+            <input matInput formControlName="postalCodeCtrl" placeholder="Ex : 42210" required>
+          </mat-form-field>
+          <!-- Ville -->
+          <mat-form-field appearance="fill">
+            <mat-label>Ville</mat-label>
+            <input matInput formControlName="cityCtrl" placeholder="Ex : Saint-Malo" required>
+          </mat-form-field>
+        </p>
+
+        <p>
+          <!-- Pays -->
+          <mat-form-field appearance="fill">
+            <mat-label>Pays</mat-label>
+            <mat-select formControlName="countryCtrl" required>
+              <mat-option *ngFor="let country of countries" [value]="country">{{ country.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </p>
+
+        <div>
+          <button mat-stroked-button matStepperNext>Suivant</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Step 2 -->
+    <mat-step label="Procédez au paiement">
+      <ng-template matStepLabel>Paiement</ng-template>
+      <div id="paypal-button-container" class="text-center">
+        <p>Total à payer : <b>{{ offer!.price }} €</b></p>
+      </div>
+      <div class="form-item-group">
+        <button mat-stroked-button matStepperPrevious>Retour</button>
+        <!-- <button mat-stroked-button matStepperNext>Next</button> -->
+      </div>
+    </mat-step>
+
+    <!-- Step 3 -->
+    <mat-step>
+      <ng-template matStepLabel>Validation</ng-template>
+      <p style="margin-top: 5px;">Votre commande a bien été prise en compte.</p>
+      <div class="form-item-group">
+        <!-- <button mat-stroked-button matStepperPrevious>Retour</button> -->
+        <button mat-stroked-button (click)="home()">Retour à l'accueil</button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+
+</div>

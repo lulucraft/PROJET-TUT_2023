@@ -1,13 +1,15 @@
 package fr.nepta.cloud.api.auth;
 
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,7 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.nepta.cloud.CloudApplication;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.service.MailService;
 import fr.nepta.cloud.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -39,6 +44,9 @@ import lombok.extern.log4j.Log4j2;
 public class AuthController {
 
 	private final UserService us;
+
+	@Autowired
+	private final MailService mails;
 
 	@GetMapping(value = "refreshtoken")//consumes = "application/json", 
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
@@ -106,6 +114,24 @@ public class AuthController {
 		us.addRoleToUser(user.getUsername(), "USER");
 
 		return user.getId().toString();
+	}
+
+	@PostMapping(value = "resetpassword")
+	public void resetPassword(@RequestBody String email) throws Exception {
+		User user = us.getUserFromEmail(email);
+
+		if (user == null) return;
+
+		String newPassword = getRandomSpecialChars(13).collect(Collectors.toList()).stream().map(String::valueOf).collect(Collectors.joining());
+		user.setPassword(newPassword);// Auto encoded with bcrypt
+		us.saveUser(user);
+		mails.sendMail(email, newPassword);
+	}
+
+	private Stream<Character> getRandomSpecialChars(int count) {
+	    Random random = new SecureRandom();
+	    IntStream specialChars = random.ints(count, 33, 45);
+	    return Stream.concat(specialChars.mapToObj(data -> (char) data), Stream.of((char) (new Random().nextInt(26) + 'a')));
 	}
 
 //	@PostMapping(value = "login", consumes = "application/json", produces = "application/json")

@@ -46,3 +46,8 @@
     }
   }
 }
+
+// Remove hover effect on footer
+.mdc-data-table__row:not(.mdc-data-table__row--selected):hover {
+  background-color: initial;
+}

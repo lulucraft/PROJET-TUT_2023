@@ -2,6 +2,7 @@ package fr.nepta.cloud.service;
 
 import java.util.List;
 
+import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 
@@ -26,5 +27,9 @@ public interface UserService {
 	void setDarkMode(User user, boolean darkModeEnabled) throws Exception;
 
 	void editUser(User user) throws Exception;
+
+	void addFileToUser(User user, File file);
+
+	User getUserFromEmail(String email) throws Exception;
 
 }

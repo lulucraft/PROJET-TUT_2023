@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.repository.RoleRepo;
@@ -129,7 +130,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			throw new Exception("User is null");
 		}
 
-		User u = userRepo.getById(user.getId());
+		User u = userRepo.findById(user.getId()).get();
 		if (u == null) {
 			log.error("User '{}' not found in the database", user.getId());
 			throw new Exception("User not found in database");
@@ -144,6 +145,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		u.setAccountActive(user.isAccountActive());
 
 		log.info("User '{}' updated", u.getId());
+	}
+
+	@Override
+	public void addFileToUser(User user, File file) {
+		user.getFiles().add(file);
+		userRepo.save(user);
+	}
+
+	@Override
+	public User getUserFromEmail(String email) throws Exception {
+		return userRepo.findByEmail(email);
 	}
 
 }

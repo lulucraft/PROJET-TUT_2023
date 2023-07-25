@@ -93,6 +93,8 @@ export class AuthService {
             return;
           }
 
+          user.offer = decodedToken.offer;
+
           // User roles
           user.roles = [];
           for (let role of decodedToken.roles) {//this.getUserRolesFromToken(user)
@@ -110,7 +112,6 @@ export class AuthService {
 
           localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
-          console.log(resp['accessToken']);
 
           if (redirect) {
             if (this.route.snapshot.queryParams['returnUrl']) {
@@ -147,6 +148,10 @@ export class AuthService {
     localStorage.removeItem('currentUser');
     // If returnUrl is defined, redirect to it
     this.router.navigate(['/login'], (returnUrl ? { queryParams: { returnUrl: returnUrl } } : undefined));
+  }
+
+  resetPassword(email: any): Observable<any> {
+    return this.http.post<any>(this.apiBaseUrl + 'api/auth/resetpassword', email);
   }
 
   saveRefreshToken(token: JWTToken): void {

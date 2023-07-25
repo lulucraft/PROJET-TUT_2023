@@ -10,6 +10,8 @@ public interface FileService {
 
 	Collection<File> getFiles();
 
-	File getFile(String fileName);
+	File getFile(long id);
+
+	File getFile(String string);
 
 }

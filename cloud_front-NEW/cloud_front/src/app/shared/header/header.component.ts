@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -10,7 +11,7 @@ export class HeaderComponent {
   public settingsMenuOpened: boolean = false;
   public leftMenuOpened: boolean = false;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   openSettingsMenu(): void {
     this.settingsMenuOpened = !this.settingsMenuOpened;
@@ -20,6 +21,10 @@ export class HeaderComponent {
   openLeftMenu() {
     this.leftMenuOpened = !this.leftMenuOpened;
     this.settingsMenuOpened = false;
+  }
+
+  hasOffer(): boolean {
+    return !!this.authService.currentUserValue?.offer;
   }
 
 }

@@ -11,11 +11,17 @@
       </div>
 
       <div class="auth-form-input">
-        <mat-form-field>
-          <mat-icon aria-hidden="true" matIconPrefix>key</mat-icon>
-          <mat-label>Mot de passe</mat-label>
-          <input matInput type="password" formControlName="password" required />
-        </mat-form-field>
+        <div class="auth-form-item">
+          <mat-form-field>
+            <mat-icon aria-hidden="true" matIconPrefix>key</mat-icon>
+            <mat-label>Mot de passe</mat-label>
+            <input matInput type="password" formControlName="password" required />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="auth-form-item" style="margin-top: -30px;">
+        <small><a routerLink="/reset-password">Mot de passe oublié ?</a></small>
       </div>
     </div>
 

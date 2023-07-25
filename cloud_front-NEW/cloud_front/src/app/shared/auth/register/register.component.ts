@@ -13,6 +13,7 @@ export class RegisterComponent implements OnInit {
 
   public registerForm: FormGroup = new FormBuilder().group({
     username: ['', Validators.required],
+    email: ['', Validators.required],
     password: ['', Validators.required],
     confirmPassword: ['', Validators.required]
   });
@@ -37,6 +38,12 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
+    let email: string = this.registerForm.controls["email"].value;
+    if (!email) {
+      this.snackBar.open('Veuillez entrer une adresse email', '', { duration: 2500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      return;
+    }
+
     let password: string = this.registerForm.controls["password"].value;
     let confirmPassword: string = this.registerForm.controls["confirmPassword"].value;
 
@@ -47,6 +54,7 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register({
       username: username,
+      email: email,
       password: password,
     });
   }

@@ -2,15 +2,14 @@ package fr.nepta.cloud.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -32,8 +31,13 @@ public class File {
 	@DateTimeFormat(pattern = "dd-MM-yyyy HH:mm")
 	private Date creationDate;
 
-	@Column(name = "modificationdate", nullable = false)
+	@Column(name = "modificationdate", nullable = true)
 	@DateTimeFormat(pattern = "dd-MM-yyyy HH:mm")
 	private Date startDate;
 
+	@Column(name = "size", nullable = false)
+	private long size;
+
+	@Column(name = "hash", nullable = false)
+	private String hash;
 }

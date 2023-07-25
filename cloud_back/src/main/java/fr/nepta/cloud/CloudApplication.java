@@ -1,6 +1,7 @@
 package fr.nepta.cloud;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.springframework.boot.CommandLineRunner;
@@ -8,6 +9,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -16,6 +19,7 @@ import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.service.FileService;
+import fr.nepta.cloud.service.OfferService;
 import fr.nepta.cloud.service.RoleService;
 import fr.nepta.cloud.service.UserService;
 
@@ -35,7 +39,7 @@ public class CloudApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(UserService us, RoleService rs, FileService ns) {
+	CommandLineRunner run(RoleService rs, UserService us, FileService ns, OfferService os) {
 		return args -> {
 			// ROLES
 			if (rs.getRole("USER") == null) {
@@ -43,6 +47,14 @@ public class CloudApplication {
 			}
 			if (rs.getRole("ADMIN") == null) {
 				rs.saveRole(new Role(null, "ADMIN"));
+			}
+
+			if (os.getOffer("Particulier") == null) {
+				os.saveOffer(new Offer(null, "Particulier", 10, Arrays.asList("Tous les formats de fichiers"), Arrays.asList("Pas de partage de fichiers")));
+			}
+
+			if (os.getOffer("Professionnel") == null) {
+				os.saveOffer(new Offer(null, "Professionnel", 20, Arrays.asList("Tous les formats de fichiers", "Partage fichiers illimité"), Arrays.asList()));
 			}
 
 			// Create default users
@@ -63,13 +75,39 @@ public class CloudApplication {
 			}
 
 			// NEWSLETTER
-			if (ns.getFile("test") == null) {
-				ns.saveFile(new File(null, "Fichier1", null, new Date()));
+			if (ns.getFile("Fichier1") == null) {
+				ns.saveFile(new File(null, "Fichier1", new Date(), null, 0, "fezfezzef"));
 			}
-			if (ns.getFile("SELLS") == null) {
-				ns.saveFile(new File(null, "Fichier2", null, new Date()));
+			if (ns.getFile("Fichier2") == null) {
+				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg"));
 			}
 		};
+	}
+
+	@Bean
+	JavaMailSender getJavaMailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("ssl0.ovh.net");
+		mailSender.setPort(587);
+
+		mailSender.setUsername("admin@juline.tech");
+		mailSender.setPassword("MyS_fztv6TCN5mt!");
+
+//		Properties props = mailSender.getJavaMailProperties();
+//		props.put("mail.smtp.host", "ssl0.ovh.net");
+////		props.put("mail.smtp.ssl.trust", "ssl0.ovh.net");
+////		props.put("mail.transport.protocol", "smtp");
+////		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+//		props.put("mail.smtp.auth", "true");
+////		props.put("mail.smtp.user", "admin@juline.tech");
+////		props.put("mail.smtp.password", "MyS_fztv6TCN5mt!");
+////		props.put("mail.smtp.port", "587");
+//		props.put("mail.smtp.starttls.enable", "true");
+//		props.put("mail.smtp.starttls.required", "true");
+////		props.put("mail.smtp.ssl.enable", "true");
+//		props.put("mail.debug", "false");
+
+		return mailSender;
 	}
 
 }

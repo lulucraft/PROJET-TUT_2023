@@ -1,0 +1,27 @@
+.checkout {
+  margin-top: 40px;
+}
+
+.form-item-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+#paypal-button-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 33vw;
+  margin: auto;
+}
+
+:host-context(.darkMode) {
+  .checkout {
+    color: white;
+  }
+}
+
+// Disable header navigation
+::ng-deep .mat-horizontal-stepper-header {
+  pointer-events: none !important;
+}

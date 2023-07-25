@@ -7,11 +7,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +22,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.nepta.cloud.CloudApplication;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -36,11 +35,11 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 	    response.setHeader("Access-Control-Allow-Credentials", "true");
-	    response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+	    response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 	    response.setHeader("Access-Control-Max-Age", "3600");
 	    response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
 
-		if (request.getServletPath().equals("/api/auth/register") || request.getServletPath().equals("/api/auth/login") || request.getServletPath().equals("/api/auth/refreshtoken")) {
+		if (request.getServletPath().equals("/api/auth/register") || request.getServletPath().equals("/api/auth/login") || request.getServletPath().equals("/api/auth/logout") || request.getServletPath().equals("/api/auth/refreshtoken") || request.getServletPath().equals("/api/auth/resetpassword")) {
 		} else {
 			String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
