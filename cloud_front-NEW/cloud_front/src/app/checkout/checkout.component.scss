@@ -8,11 +8,12 @@
   justify-content: center;
 }
 
-#paypal-button-container {
-  margin-top: 10px;
-  margin-bottom: 10px;
+#paypal-container {
   width: 33vw;
   margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
 }
 
 :host-context(.darkMode) {

@@ -25,6 +25,7 @@ import { FilesComponent } from './views/main/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
+import { NgxPayPalModule } from 'ngx-paypal';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -57,6 +58,8 @@ registerLocaleData(localeFr, 'fr-FR');
     ReactiveFormsModule,
 
     MaterialModule,
+
+    NgxPayPalModule,
 
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),

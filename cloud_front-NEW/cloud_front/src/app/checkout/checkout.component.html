@@ -1,4 +1,4 @@
-<div class="checkout text-center" *ngIf="offer">
+<div class="checkout text-center" *ngIf="(offerObservable | async) && offer">
   <mat-stepper linear="true" #stepper>
     <!-- Step 1 -->
     <mat-step [stepControl]="firstFormGroup" label="Entrez l'adresse de livraison">
@@ -54,9 +54,13 @@
     <!-- Step 2 -->
     <mat-step label="Procédez au paiement">
       <ng-template matStepLabel>Paiement</ng-template>
-      <div id="paypal-button-container" class="text-center">
+
+      <ngx-paypal [config]="payPalConfig" id="paypal-container"></ngx-paypal>
+
+      <div class="text-center">
         <p>Total à payer : <b>{{ offer!.price }} €</b></p>
       </div>
+
       <div class="form-item-group">
         <button mat-stroked-button matStepperPrevious>Retour</button>
         <!-- <button mat-stroked-button matStepperNext>Next</button> -->

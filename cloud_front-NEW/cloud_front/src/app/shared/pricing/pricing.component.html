@@ -1,33 +1,35 @@
-<div id="center" class="darkModeAuto">
-  <h3 class="text-center">Nos tarifs</h3>
-  <div class="pricing-container">
-    <div class="pricing-block darkModeAuto" *ngFor="let offer of offers">
-      <h4 class="text-center">Offre {{ offer.name }}</h4>
+<ng-container *ngIf="offers && (offersObservable | async) else loading">
+  <div id="center" class="darkModeAuto">
+    <h3 class="text-center">Nos tarifs</h3>
 
-      <h2 class="text-center" style="color: var(--primary-color)">{{ offer.price }}€</h2>
-      <p class="text-center" style="margin-top: -20px">/mois</p>
+    <div class="pricing-container">
+      <div class="pricing-block darkModeAuto" *ngFor="let offer of offers">
+        <h4 class="text-center">Offre {{ offer.name }}</h4>
 
-      <mat-divider></mat-divider>
+        <h2 class="text-center" style="color: var(--primary-color)">{{ offer.price }}€</h2>
+        <p class="text-center" style="margin-top: -20px">/mois</p>
 
-      <ul>
-        <li *ngFor="let advantage of offer.advantages">
-          <mat-icon color="primary">check_circle</mat-icon>
-          <span>{{ advantage }}</span>
-        </li>
-        <li *ngFor="let disadvantage of offer.disadvantages">
-          <mat-icon color="warn">cancel</mat-icon>
-          <span>{{ disadvantage }}</span>
-        </li>
-      </ul>
+        <mat-divider></mat-divider>
 
-      <mat-divider></mat-divider>
+        <ul>
+          <li *ngFor="let advantage of offer.advantages">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>{{ advantage }}</span>
+          </li>
+          <li *ngFor="let disadvantage of offer.disadvantages">
+            <mat-icon color="warn">cancel</mat-icon>
+            <span>{{ disadvantage }}</span>
+          </li>
+        </ul>
 
-      <div class="pricing-block-footer text-center">
-        <button mat-stroked-button (click)="choiceOffer(offer.id)">Choisir cette offre</button>
+        <mat-divider></mat-divider>
+
+        <div class="pricing-block-footer text-center">
+          <button mat-stroked-button (click)="choiceOffer(offer.id)">Choisir cette offre</button>
+        </div>
       </div>
-    </div>
 
-    <!-- <div class="pricing-block darkModeAuto">
+      <!-- <div class="pricing-block darkModeAuto">
       <h4 class="text-center">Offre particulier</h4>
 
       <mat-divider></mat-divider>
@@ -72,5 +74,10 @@
         <button mat-stroked-button (click)="choiceOffer(2)">Choisir cette offre</button>
       </div>
     </div> -->
+    </div>
   </div>
-</div>
+</ng-container>
+
+<ng-template #loading>
+  <p class="loading text-center">Chargement des données ...</p>
+</ng-template>

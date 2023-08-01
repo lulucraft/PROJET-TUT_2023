@@ -17,6 +17,8 @@ header {
   .header-item-left {
     // float: left;
     display: flex;
+    justify-content: flex-start;
+    flex: 1;
     height: inherit;
     // width: 45px;
     margin-left: 5px;
@@ -30,11 +32,14 @@ header {
 
   .header-item-center {
     display: flex;
+    justify-content: center;
+    margin: auto;
+    flex: 1;
 
     a {
       color: white;
       text-decoration: none;
-      border: 1px solid;
+      border: 2px solid;
     }
   }
 
@@ -44,6 +49,9 @@ header {
     // top: 50%;
     // transform: translateY(-50%);
     margin-right: 5px;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
   }
 
   .header-inline-item {

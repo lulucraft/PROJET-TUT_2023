@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs/internal/Observable';
 import { Offer } from 'src/app/models/offer';
 import { DataService } from 'src/app/services/data.service';
 
@@ -10,12 +11,14 @@ import { DataService } from 'src/app/services/data.service';
 })
 export class PricingComponent {
 
+  public offersObservable?: Observable<Offer[]>;
   public offers: Offer[] = [];
 
   constructor(private router: Router, private dataService: DataService) { }
 
   ngOnInit(): void {
-    this.dataService.getOffers().subscribe((offers: Offer[]) => {
+    this.offersObservable = this.dataService.getOffers();
+    this.offersObservable.subscribe((offers: Offer[]) => {
       this.offers = offers;
     });
   }

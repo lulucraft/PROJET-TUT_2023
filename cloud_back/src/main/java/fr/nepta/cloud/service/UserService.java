@@ -3,6 +3,8 @@ package fr.nepta.cloud.service;
 import java.util.List;
 
 import fr.nepta.cloud.model.File;
+import fr.nepta.cloud.model.Offer;
+import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 
@@ -28,8 +30,12 @@ public interface UserService {
 
 	void editUser(User user) throws Exception;
 
-	void addFileToUser(User user, File file);
+	void addFileToUser(User user, File file) throws Exception;
 
 	User getUserFromEmail(String email) throws Exception;
+
+	void addOrderToUser(User user, Order order);
+
+	void setOffer(User user, Offer offer);
 
 }

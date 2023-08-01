@@ -1,5 +1,6 @@
 package fr.nepta.cloud.api.user;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
@@ -20,13 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Offer;
+import fr.nepta.cloud.model.Order;
+import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.service.FileService;
 import fr.nepta.cloud.service.OfferService;
+import fr.nepta.cloud.service.OrderService;
+import fr.nepta.cloud.service.PayPalService;
 import fr.nepta.cloud.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor @Slf4j
 //@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
 @CrossOrigin(origins = {"*"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
 @RestController
@@ -39,6 +45,8 @@ public class UserController {
 	private final FileService fs;
 	@Autowired
 	private final OfferService os;
+	@Autowired
+	private final OrderService ors;
 
 	//	@GetMapping(value = "users")
 	//	public String getUsers() {
@@ -55,12 +63,14 @@ public class UserController {
 	@RolesAllowed({"USER","ADMIN"})
 	@PutMapping(value = "file")
 	public File addFile(@RequestBody File file) {//@RequestBody File file
-		System.err.println(file);
+		log.info("Saving file {} on the database", file.getId());
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash()));
-		us.addFileToUser(us.getUser(auth.getName()), f);
-		// Sauvegarde du fichier sur le disque
-		// TODO
+		try {
+			us.addFileToUser(us.getUser(auth.getName()), f);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return f;
 	}
 
@@ -140,5 +150,42 @@ public class UserController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		us.setDarkMode(us.getUser(auth.getName()), darkModeEnabled);
 	}
-	
+
+	@RolesAllowed("USER")
+	@PostMapping(value = "order")
+	public void sendOrder(@RequestBody Order order) throws Exception {
+		log.info("Saving order {} on the database",  order.getPaypalId());
+
+		// Order already exists
+		if (ors.getOrder(order.getPaypalId()) != null) {
+			log.error("An order with PayPal ID {} already exists", order.getPaypalId());
+			return;
+		}
+
+		try {
+			order.setOffer(PayPalService.getOrderOffer(order.getPaypalId()));
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			log.error("Impossible to get offer of order '{}' from the paypal order", order.getPaypalId());
+			return;
+		}
+
+		ors.saveOrder(order);
+
+		// // Avoid bypass of admin validation
+		// conge.setValidated(false);
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+
+		if (user == null) {
+			log.error("User '{}' doesn't exists on the database", auth.getName());
+			return;
+		}
+
+		// Add order to authenticated user from his username
+		us.addOrderToUser(user, order);
+		us.setOffer(user, order.getOffer());
+	}
+
 }

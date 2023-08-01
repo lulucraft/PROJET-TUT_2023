@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.nepta.cloud.model.File;
+import fr.nepta.cloud.model.Offer;
+import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.repository.RoleRepo;
@@ -148,14 +150,39 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public void addFileToUser(User user, File file) {
-		user.getFiles().add(file);
-		userRepo.save(user);
+	public void addFileToUser(User user, File file) throws Exception {
+		if (user == null) {
+			log.error("User is null");
+			throw new Exception("User is null");
+		}
+
+		Collection<File> files = user.getFiles();
+		files.add(file);
+		user.setFiles(files);
+//		userRepo.save(user);
+
+		log.info("Saving '{}' on the database", user.getId());
 	}
 
 	@Override
 	public User getUserFromEmail(String email) throws Exception {
+		log.info("Fetching user '{}' from the database", email);
 		return userRepo.findByEmail(email);
+	}
+
+	@Override
+	public void addOrderToUser(User user, Order order) {
+		user.getOrders().add(order);
+		userRepo.save(user);
+
+		log.info("Adding order '{}' to user '{}'", order.getId(), user.getId());
+	}
+
+	@Override
+	public void setOffer(User user, Offer offer) {
+		user.setOffer(offer);
+
+		log.info("Set offer '{}' to user '{}'", offer.getId(), user.getId());
 	}
 
 }

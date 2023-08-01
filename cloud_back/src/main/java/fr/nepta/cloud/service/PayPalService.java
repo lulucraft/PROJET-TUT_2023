@@ -6,8 +6,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
@@ -35,7 +33,7 @@ public class PayPalService {
 		os = offerService;
 	}
 
-	public static Collection<Offer> getOrderProducts(String orderId) throws IOException, InterruptedException, JSONException {
+	public static Offer getOrderOffer(String orderId) throws IOException, InterruptedException, JSONException {
 		JSONObject checkoutOrders = getCheckoutOrders(orderId);
 
 		if (checkoutOrders == null) return null;
@@ -63,8 +61,6 @@ public class PayPalService {
 			return null;
 		}
 
-		Collection<Offer> products = new ArrayList<>();
-
 		// Get purshase_units items and convert to product
 		for (int i = 0; i < items.length(); i++) {
 			JSONObject jsonProduct = (JSONObject) items.get(i);
@@ -74,17 +70,19 @@ public class PayPalService {
 				continue;
 			}
 
-			Offer p = os.getOffer((String) jsonProduct.get("name"));
-			if (p != null) {
-				int quantity = (int) Integer.parseInt((String) jsonProduct.get("quantity"));
-				System.err.println(quantity);
-				for (int i1 = 0; i1 < quantity; i1++) {
-					products.add(p);
-				}
+			Offer o = os.getOffer((String) jsonProduct.get("name"));
+			if (o != null) {
+				System.out.println(o.getName());
+				return o;
+//				int quantity = (int) Integer.parseInt((String) jsonProduct.get("quantity"));
+//				System.err.println(quantity);
+//				for (int i1 = 0; i1 < quantity; i1++) {
+//					products.add(p);
+//				}
 			}
 		}
 
-		return products;
+		return null;
 	}
 
 	private static String getToken() throws IOException, InterruptedException {
@@ -100,13 +98,14 @@ public class PayPalService {
 				.build();
 
 		HttpClient client = HttpClient.newBuilder().build();
-		HttpResponse<?> response = client.send(request, BodyHandlers.ofString());
+		HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-		JSONObject jsonResponse = null;
 		try {
-			jsonResponse = (JSONObject) new JSONParser(response.body().toString()).parse();
-			return (String) jsonResponse.get("access_token");
-		} catch (ParseException | JSONException e) {
+			JSONObject jsonResponse = new JSONObject(new JSONParser(response.body()).object());
+//			JSONObject jsonResponse = (JSONObject) response.body();
+//			jsonResponse = (JSONObject) new JSONParser(response.body().toString()).parse();
+			return jsonResponse.getString("access_token");
+		} catch (JSONException | ParseException e) {
 			log.error("PayPal access_token request failed");
 			e.printStackTrace();
 		}
@@ -133,11 +132,11 @@ public class PayPalService {
 				.build();
 
 		HttpClient client = HttpClient.newBuilder().build();
-		HttpResponse<?> response = client.send(request, BodyHandlers.ofString());
+		HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
 		JSONObject jsonResponse = null;
 		try {
-			jsonResponse = (JSONObject) new JSONParser(response.body().toString()).parse();
+			jsonResponse = new JSONObject(new JSONParser(response.body()).object());
 		} catch (ParseException e) {
 			log.error("Authorizations request failed for order '{}'", orderId);
 			e.printStackTrace();

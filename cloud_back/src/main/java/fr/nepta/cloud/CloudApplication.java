@@ -1,8 +1,10 @@
 package fr.nepta.cloud;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Offer;
+import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.service.FileService;
@@ -50,17 +53,29 @@ public class CloudApplication {
 			}
 
 			if (os.getOffer("Particulier") == null) {
-				os.saveOffer(new Offer(null, "Particulier", 10, Arrays.asList("Tous les formats de fichiers"), Arrays.asList("Pas de partage de fichiers")));
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+
+				Set<String> disadvantages = new HashSet<>();
+				disadvantages.add("Pas de partage de fichiers");
+
+				os.saveOffer(new Offer(null, "Particulier", 10, advantages, disadvantages));
 			}
 
 			if (os.getOffer("Professionnel") == null) {
-				os.saveOffer(new Offer(null, "Professionnel", 20, Arrays.asList("Tous les formats de fichiers", "Partage fichiers illimité"), Arrays.asList()));
+//				System.err.println(advRepor.getAdvantagesByName("Tous les formats de fichiers"));
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+				advantages.add("Partage fichiers illimité");
+
+				os.saveOffer(new Offer(null, "Professionnel", 20, advantages, new HashSet<>()));
 			}
 
 			// Create default users
 			if (us.getUser("admin") == null) {
 				Offer offer = null;
-				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), true, true, offer, new ArrayList<Role>(), new ArrayList<File>()));
+				List<Order> orders = null;
+				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>()));
 			}
 			if (!us.getUser("admin").getRoles().contains(rs.getRole("ADMIN"))) {
 				us.addRoleToUser("admin", "ADMIN");
@@ -68,7 +83,8 @@ public class CloudApplication {
 
 			if (us.getUser("user") == null) {
 				Offer offer = null;
-				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), true, true, offer, new ArrayList<Role>(), new ArrayList<File>()));
+				List<Order> orders = null;
+				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>()));
 			}
 			if (!us.getUser("user").getRoles().contains(rs.getRole("USER"))) {
 				us.addRoleToUser("user", "USER");

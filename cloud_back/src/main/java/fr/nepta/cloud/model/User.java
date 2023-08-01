@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -60,8 +61,12 @@ public class User implements Cloneable {
 	//	@Column(name = "refresh_token")
 	//	private String refreshToken;
 
+//	@Column(name = "offer_id")
 	@OneToOne
 	private Offer offer;
+
+	@OneToMany
+	private Collection<Order> orders;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	private Collection<Role> roles = new ArrayList<>();

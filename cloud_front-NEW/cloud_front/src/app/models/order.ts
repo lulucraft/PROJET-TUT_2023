@@ -1,4 +1,5 @@
 export interface Order {
-  id: string;
+  id?: number;
+  paypalId: string;
   date: Date;
 }
