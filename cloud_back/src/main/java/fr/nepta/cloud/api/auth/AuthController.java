@@ -122,9 +122,12 @@ public class AuthController {
 
 		if (user == null) return;
 
+		// Generate new random password
 		String newPassword = getRandomSpecialChars(13).collect(Collectors.toList()).stream().map(String::valueOf).collect(Collectors.joining());
-		user.setPassword(newPassword);// Auto encoded with bcrypt
+		user.setPassword(newPassword);// Password auto encoded with bcrypt
+
 		us.saveUser(user);
+		// Send mail to user which contains the new password
 		mails.sendMail(email, newPassword);
 	}
 

@@ -8,6 +8,7 @@ import { AuthService } from '../services/auth.service';
 import { DataService, countries } from '../services/data.service';
 import { MatStepper } from '@angular/material/stepper';
 import { Observable } from 'rxjs/internal/Observable';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-checkout',
@@ -28,7 +29,6 @@ export class CheckoutComponent implements OnInit {
   });
 
   public countries: Country[] = [];
-  public offerObservable?: Observable<Offer>;
   public offer?: Offer;
 
   public payPalConfig?: IPayPalConfig;
@@ -38,7 +38,8 @@ export class CheckoutComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private dataService: DataService,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -60,8 +61,7 @@ export class CheckoutComponent implements OnInit {
       }
 
       // Get Offer from database
-      this.offerObservable = this.dataService.getOffer(parseInt(id));
-      this.offerObservable.subscribe({
+      this.dataService.getOffer(parseInt(id)).subscribe({
         next: async (offer: Offer) => {
           this.offer = offer;
 
@@ -222,7 +222,7 @@ export class CheckoutComponent implements OnInit {
         label: "paypal"
       },
       onApprove: async (data: IOnApproveCallbackData, actions: IOnApproveCallbackActions) => {
-        console.log("Transaction ID: " + data.subscriptionID);
+        console.log("Subscription ID: " + data.subscriptionID);
         console.log("Order ID: " + data.orderID);
         console.log("Payer ID: " + data.payerID);
 
@@ -257,8 +257,12 @@ export class CheckoutComponent implements OnInit {
           paypalId: order.id,
           date: new Date()
           // products: paypalProducts
-        }).subscribe(data => {
-          console.log(data);
+        }).subscribe(() => {
+          // Refresh token to get new user details on token (with offer)
+          this.authService.refreshTokenRequest().subscribe(() => {
+            console.log("User offer updated");
+            this.snackBar.open('Votre compte a été mis à jour', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+          });
         });
 
         // Change the route to the success page

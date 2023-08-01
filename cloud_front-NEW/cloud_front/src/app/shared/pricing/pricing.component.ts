@@ -11,16 +11,16 @@ import { DataService } from 'src/app/services/data.service';
 })
 export class PricingComponent {
 
-  public offersObservable?: Observable<Offer[]>;
+  public offers$?: Observable<Offer[]>;
   public offers: Offer[] = [];
 
   constructor(private router: Router, private dataService: DataService) { }
 
   ngOnInit(): void {
-    this.offersObservable = this.dataService.getOffers();
-    this.offersObservable.subscribe((offers: Offer[]) => {
-      this.offers = offers;
-    });
+    this.offers$ = this.dataService.getOffers();
+    // this.offersObservable.subscribe((offers: Offer[]) => {
+    //   this.offers = offers;
+    // });
   }
 
   choiceOffer(offer: number): void {

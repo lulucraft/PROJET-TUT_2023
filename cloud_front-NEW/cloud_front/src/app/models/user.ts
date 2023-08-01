@@ -18,5 +18,5 @@ export interface User {
   token?: JWTToken;
   darkModeEnabled?: boolean | true;
   accountActive?: boolean;
-  offer?: Offer;
+  offer?: string;
 }

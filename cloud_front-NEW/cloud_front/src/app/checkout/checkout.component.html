@@ -1,4 +1,4 @@
-<div class="checkout text-center" *ngIf="(offerObservable | async) && offer">
+<div class="checkout text-center" *ngIf="offer">
   <mat-stepper linear="true" #stepper>
     <!-- Step 1 -->
     <mat-step [stepControl]="firstFormGroup" label="Entrez l'adresse de livraison">

@@ -42,10 +42,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-//		Enumeration<String> a = request.getAttributeNames();
-//		for (; a.hasMoreElements(); a.nextElement()) {
-//			System.err.println(a.nextElement());
-//		}
 
 		String username = request.getParameter(SPRING_SECURITY_FORM_USERNAME_KEY);
 		String password = request.getParameter(SPRING_SECURITY_FORM_PASSWORD_KEY);
@@ -77,6 +73,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 				.withClaim("creation_date", user.getCreationDate())
 				.withClaim("dark_mode_enabled", user.isDarkModeEnabled())
 				.withClaim("account_active", user.isAccountActive())
+				.withClaim("offer", user.getOffer() != null ? user.getOffer().getName() : null)
 				.sign(algo);
 
 		String refreshToken = JWT.create()
@@ -93,7 +90,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		tokens.put("refreshToken", refreshToken);
 
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//		response.setHeader("Access-Control-Allow-Origin", "*");
+		//		response.setHeader("Access-Control-Allow-Origin", "*");
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 	}
 

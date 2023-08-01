@@ -1,4 +1,4 @@
-<ng-container *ngIf="offers && (offersObservable | async) else loading">
+<ng-container *ngIf="(offers$ | async) as offers else loading">
   <div id="center" class="darkModeAuto">
     <h3 class="text-center">Nos tarifs</h3>
 

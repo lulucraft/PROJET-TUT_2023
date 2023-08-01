@@ -37,6 +37,10 @@ export class SidebarLeftComponent implements OnInit {
     return this.authService.isUserAdmin();
   }
 
+  hasOffer(): boolean {
+    return !!this.authService.currentUserValue?.offer;
+  }
+
   getUserName(): string {
     if (!this.authService.currentUserValue) {
       // Default to display

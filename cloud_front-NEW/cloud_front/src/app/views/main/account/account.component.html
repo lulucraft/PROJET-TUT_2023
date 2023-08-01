@@ -25,5 +25,13 @@
         <input matInput type="text" [value]="getRoles()" readonly />
       </mat-form-field>
     </p>
+
+    <!-- Offre -->
+    <p>
+      <mat-form-field [floatLabel]="'always'">
+        <mat-label>Offre souscrite</mat-label>
+        <input matInput type="text" [value]="user.offer ? user.offer : 'Aucune'" readonly />
+      </mat-form-field>
+    </p>
   </div>
 </div>

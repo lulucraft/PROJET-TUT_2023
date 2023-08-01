@@ -29,16 +29,6 @@ public class SecurityConfig {
 	@Autowired
     private ApplicationContext applicationContext;
 
-//	@Override
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-////		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-//		auth.authenticationProvider(daoAuthenticationProvider());
-//
-////		String pass = passwordEncoder().encode("test");
-////		System.err.println(pass);
-////		auth.inMemoryAuthentication().withUser("admin").password(pass).roles("ADMIN");
-//	}
-
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.cors((cors) -> cors.configure(http));
@@ -52,7 +42,7 @@ public class SecurityConfig {
 			// ALL
 			authorizeHttpRequests.requestMatchers("/api/auth/**").permitAll()
 			// USER
-			.requestMatchers(HttpMethod.GET, "/api/users").hasAnyAuthority("USER")
+			//.requestMatchers(HttpMethod.GET, "/api/users").hasAnyAuthority("USER")
 			// ADMIN
 			.requestMatchers(HttpMethod.POST, "/api/users").hasAnyAuthority("USER")
 			.requestMatchers(HttpMethod.GET, "/api/admin/**").hasAnyAuthority("ADMIN")
@@ -62,16 +52,6 @@ public class SecurityConfig {
 
 		// Logout URL
 		http.logout((logoutCustomizer) -> logoutCustomizer.logoutUrl("/api/auth/logout").deleteCookies("JSESSIONID"));
-
-		// USER
-//		http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/api/users").hasAnyAuthority("USER");
-//		http.authorizeHttpRequests().antMatchers(HttpMethod.POST, "/api/users").hasAnyAuthority("USER");
-
-		// ADMIN
-//		http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/api/admin/**").hasAnyAuthority("ADMIN");
-//		http.authorizeHttpRequests().antMatchers(HttpMethod.POST, "/api/admin/**").hasAnyAuthority("ADMIN");
-
-//		http.authorizeHttpRequests().anyRequest().authenticated().and().logout().logoutUrl("/api/auth/logout").deleteCookies("JSESSIONID");
 
 		AuthenticationFilter authFilter = new AuthenticationFilter(authenticationManager(null), applicationContext);
 		authFilter.setFilterProcessesUrl("/api/auth/login");

@@ -23,7 +23,7 @@
     </li> -->
 
     <!-- Fichiers -->
-    <li *ngIf="isAuthenticated()">
+    <li *ngIf="isAuthenticated() && hasOffer()">
       <button mat-button (click)="files()">
         <mat-icon>work_off</mat-icon>
         <span>Mes fichiers</span>

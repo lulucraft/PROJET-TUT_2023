@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor @Slf4j
 //@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"*"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
+@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
 @RestController
 @RequestMapping("api/user/")
 public class UserController {

@@ -36,6 +36,7 @@ export class TokenHttpInterceptorInterceptor implements HttpInterceptor {
         // If user not authenticated
         if (!this.authService.currentUserValue || !this.authService.currentUserValue.token) {
           this.authService.logout();
+          return throwError(() => console.error(err));
         }
 
         // If token expired
