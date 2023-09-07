@@ -27,7 +27,7 @@
 
     <div class="auth-form-item">
       <p>
-        <button mat-flat-button color="primary" type="submit" [disabled]="!loginForm.valid">Se connecter</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="!loginForm.valid || loginInProgress">Se connecter</button>
       </p>
       <p>
         <small>Vous n'avez pas de compte ? <a routerLink="/register">S'enregistrer ici</a></small>

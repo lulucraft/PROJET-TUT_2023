@@ -11,14 +11,22 @@ public class MailService {
 	@Autowired
 	private JavaMailSender mailSender;
 
-	public void sendMail(String email, String newPassword) {
+	public void sendMail(String email, String mailObject, String mailContent) {
 		SimpleMailMessage message = new SimpleMailMessage();
 
 		message.setFrom("noreply@tuxit.site");
 		message.setTo("lucas.besson@outlook.fr");
-		message.setSubject("Réinitialisation de votre mot de passe Tuxit Cloud");
-        message.setText("Votre nouveau mot de passe de connexion à Tuxit Cloud : " + newPassword);
+		message.setSubject(mailObject);
+        message.setText(mailContent);
 
 		this.mailSender.send(message);
+	}
+
+	public void sendNewPasswordMail(String email, String newPassword) {
+		sendMail(email, "Réinitialisation de votre mot de passe Tuxit Cloud", "Votre nouveau mot de passe de connexion à Tuxit Cloud : " + newPassword);
+	}
+
+	public void sendOTPMail(String email, String otpCode) {
+		sendMail(email, "Code d'authentification Tuxit Cloud", "Votre code à usage unique (1 essai) : " + otpCode);
 	}
 }

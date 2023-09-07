@@ -3,15 +3,17 @@ import { Title } from '@angular/platform-browser';
 import { PreloadAllModules, RouterModule, RouterStateSnapshot, Routes, TitleStrategy } from '@angular/router';
 import { AuthGuard } from './guard/auth.guard';
 import { HomeComponent } from './shared/home/home.component';
-import { MainComponent } from './views/main/main.component';
-import { HomeMainComponent } from './views/main/home/home.component';
-import { AccountComponent } from './views/main/account/account.component';
+import { UserComponent } from './views/user/user.component';
+import { HomeUserComponent } from './views/user/home/home.component';
+import { AccountComponent } from './views/account/account.component';
 import { RegisterComponent } from './shared/auth/register/register.component';
 import { LoginComponent } from './shared/auth/login/login.component';
-import { FilesComponent } from './views/main/files/files.component';
+import { FilesComponent } from './views/user/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
+import { CgvComponent } from './shared/cgv/cgv.component';
+import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
 
 @Injectable({ providedIn: 'root' })
 export class TemplatePageTitleStrategy extends TitleStrategy {
@@ -29,24 +31,28 @@ export class TemplatePageTitleStrategy extends TitleStrategy {
 const routes: Routes = [
   { path: '', component: HomeComponent },
 
+  { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
+
   {
-    path: 'main', component: MainComponent, canActivate: [AuthGuard],
+    path: 'user', component: UserComponent, canActivate: [AuthGuard],
     children: [
-      { path: '', component: HomeMainComponent },
-      { path: 'account', component: AccountComponent },
+      { path: '', component: HomeUserComponent },
+      // { path: 'account', component: AccountComponent },
       { path: 'files', component: FilesComponent }
     ]
   },
 
+  { path: 'cgv', component: CgvComponent },
   { path: 'pricing', component: PricingComponent },
 
   { path: 'checkout/:id', component: CheckoutComponent },
 
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'otplogin', component: OTPloginComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
 
-  { path: 'account', redirectTo: 'main/account' },
+  // { path: 'account', redirectTo: 'user/account' },
 
   { path: '**', component: HomeComponent }
 ];

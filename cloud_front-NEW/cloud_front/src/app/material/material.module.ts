@@ -17,6 +17,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatCheckboxModule,
     MatMenuModule,
     MatBadgeModule,
-    MatStepperModule
+    MatStepperModule,
+    MatDialogModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },

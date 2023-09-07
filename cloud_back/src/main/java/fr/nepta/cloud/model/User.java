@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Getter
-@Entity
+@Entity(name = "user")
 @Table(name = "user")
 public class User implements Cloneable {
 
@@ -65,7 +65,7 @@ public class User implements Cloneable {
 	@OneToOne
 	private Offer offer;
 
-	@OneToMany
+	@OneToMany(fetch = FetchType.LAZY)
 	private Collection<Order> orders;
 
 	@ManyToMany(fetch = FetchType.EAGER)

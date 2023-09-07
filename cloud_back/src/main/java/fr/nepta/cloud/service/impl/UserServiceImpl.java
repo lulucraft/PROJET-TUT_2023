@@ -1,7 +1,9 @@
 package fr.nepta.cloud.service.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.repository.OrderRepo;
 import fr.nepta.cloud.repository.RoleRepo;
 import fr.nepta.cloud.repository.UserRepo;
 import fr.nepta.cloud.service.UserService;
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	private final UserRepo userRepo;
 	private final RoleRepo roleRepo;
+	private final OrderRepo orderRepo;
 	private final PasswordEncoder passEncoder;
 
 	@Override
@@ -143,7 +147,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		if (user.getFirstname() != null) u.setFirstname(user.getFirstname());
 		if (user.getLastname() != null) u.setLastname(user.getLastname());
 		if (user.getEmail() != null) u.setEmail(user.getEmail());
-//		if (user.getCongesNbr() >= 0) u.setCongesNbr(user.getCongesNbr());
+		if (user.getOffer() != null) u.setOffer(user.getOffer());
 		u.setAccountActive(user.isAccountActive());
 
 		log.info("User '{}' updated", u.getId());
@@ -156,22 +160,102 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			throw new Exception("User is null");
 		}
 
+		if (user.getOffer() == null) {
+			log.error("L'utilisateur '{}' n'a pas souscrit d'offre mais tente d'ajouter des fichiers", user.getId());
+			return;
+		}
+
+		if (checkUserOffer(user) == false) {
+			user.setOffer(null);
+			log.error("Révocation de l'offre de l'utilisateur '{}' arrivée à expiration", user.getId());
+			return;
+		}
+
 		Collection<File> files = user.getFiles();
 		files.add(file);
 		user.setFiles(files);
-//		userRepo.save(user);
+		//userRepo.save(user);
 
-		log.info("Saving '{}' on the database", user.getId());
+		log.info("Saving '{}' in the database", user.getId());
 	}
+
+	private boolean checkUserOffer(User user) {
+		Offer o = user.getOffer();
+		if (o == null) {
+			log.error("L'utilisateur '{}' n'a pas souscrit d'offre", user.getId());
+			return false;
+		}
+
+		//List<Order> orders = orderRepo.findByUser(user);
+		//Collection<Order> orders = user.getOrders();
+
+		//		List<Order> orders = orderRepo.findAllNotArchivedByUserId(user.getId());
+		//		if (orders.size() == 0) {
+		//			log.error("L'utilisateur '{}' n'a aucune commande liée à son offre", user.getId());
+		//			return false;
+		//		}
+
+		Order or = orderRepo.findLastNotArchivedByUserId(user.getId());
+		if (or == null) {
+			log.error("L'utilisateur '{}' n'a aucune commande liée à son offre", user.getId());
+			return false;
+		}
+		int offerMonthsDuration = o.getDuration();
+
+		//		for (Order or : orders) {
+		Date orderDate = or.getDate();
+		System.err.println(orderDate);
+		Calendar expiration = Calendar.getInstance();
+		expiration.setTime(orderDate);
+		// Durée * quantité souscrite
+		expiration.add(Calendar.MONTH, offerMonthsDuration * or.getQuantity());
+		//LocalDate.now().plusMonths(offerMonthsDuration * or.getQuantity())
+		System.err.println(new Date().toString());
+		System.err.println(expiration.getTime().toString());
+		// Offre expirée si date de fin de l'offre après la date d'aujourd'hui
+		if (expiration.getTime().after(new Date())) {
+			log.error("L'utilisateur '{}' n'a aucune commande non expirée liée à son offre", user.getId());
+			// Archivage de la commande comme pas archivée et offre expirée
+			or.setArchived(true);
+			orderRepo.save(or);
+			log.error("Commande '{}' expirée, archivée pour l'utilisateur '{}'", or.getId(), user.getId());
+			return true;
+		}
+
+		log.info("The user '{}' has offer '{}'", user.getId(), or.getOffer().getId());
+		//	}
+
+		//	if (o.isArchived() && o.getDate()) {
+		//	}
+
+		return false;
+	}
+
+	//	@Override
+	//	public List<Order> getOrdersNotArchivedByUser(User user) {
+	//		return userRepo.findOrdersWhereOrderNotArchived(user);
+	//	}
 
 	@Override
 	public User getUserFromEmail(String email) throws Exception {
 		log.info("Fetching user '{}' from the database", email);
-		return userRepo.findByEmail(email);
+
+		User user = userRepo.findByEmail(email);
+		if (user == null) {
+			log.error("User not found in the database");
+			throw new Exception("User not found in the database");
+		}
+
+		return user;
 	}
 
 	@Override
-	public void addOrderToUser(User user, Order order) {
+	public void addOrderToUser(User user, Order order) throws Exception {
+		if (user == null) {
+			log.error("User is null");
+			throw new Exception("User is null");
+		}
+
 		user.getOrders().add(order);
 		userRepo.save(user);
 
@@ -181,6 +265,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Override
 	public void setOffer(User user, Offer offer) {
 		user.setOffer(offer);
+		//userRepo.save(user);
 
 		log.info("Set offer '{}' to user '{}'", offer.getId(), user.getId());
 	}

@@ -19,13 +19,16 @@ import { HeaderComponent } from './shared/header/header.component';
 import { SidebarLeftComponent } from './shared/sidebar/sidebar-left/sidebar-left.component';
 import { SidebarSettingsComponent } from './shared/sidebar/sidebar-settings/sidebar-settings.component';
 import { HomeComponent } from './shared/home/home.component';
-import { MainComponent } from './views/main/main.component';
-import { AccountComponent } from './views/main/account/account.component';
-import { FilesComponent } from './views/main/files/files.component';
+import { UserComponent } from './views/user/user.component';
+import { AccountComponent } from './views/account/account.component';
+import { FilesComponent } from './views/user/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
 import { NgxPayPalModule } from 'ngx-paypal';
+import { CgvComponent } from './shared/cgv/cgv.component';
+import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
+import { EditPasswordComponent } from './shared/auth/edit-password/edit-password.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -41,13 +44,16 @@ registerLocaleData(localeFr, 'fr-FR');
     SidebarLeftComponent,
     HomeComponent,
 
-    MainComponent,
+    UserComponent,
     AccountComponent,
 
     FilesComponent,
-     PricingComponent,
-     CheckoutComponent,
-     ResetPasswordComponent
+    PricingComponent,
+    CheckoutComponent,
+    ResetPasswordComponent,
+    CgvComponent,
+    OTPloginComponent,
+    EditPasswordComponent
   ],
   imports: [
     BrowserModule,

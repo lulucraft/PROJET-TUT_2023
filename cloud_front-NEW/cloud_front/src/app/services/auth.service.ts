@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
 import jwt_decode from 'jwt-decode';
 import { User } from '../models/user';
 import { JWTToken } from '../models/jwt-token';
@@ -73,65 +73,71 @@ export class AuthService {
       });
   }
 
-  login(user: User, redirect: boolean = true): void {
+  login(user: User, otp_code?: string, redirect: boolean = true): Observable<void> {
     let params: HttpParams = new HttpParams()
       .set('username', user.username)
       .set('password', user.password);
+    if (otp_code) params = params.set('otp_code', otp_code);
 
-    this.http.post<JWTToken>(this.apiBaseUrl + 'api/auth/login', null, { params: params })
-      .subscribe({
-        next: (resp: JWTToken) => {
-          user.token = resp;
-          // Reset password to hide it in localStorage
-          user.password = '';
+    return this.http.post<JWTToken>(this.apiBaseUrl + 'api/auth/login', null, { params: params })
+      .pipe(
+        map(
+          (resp: JWTToken) => {
+            // If no token returned -> OTP not send
+            if (!resp) {
+              if (this.router.url === '/otplogin') {
+                // Invalid OTP
+                this.snackBar.open('Code invalide, veuillez ré-essayer', '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+                this.router.navigate(['/login']);
+                return;
+              }
 
-          let decodedToken: JWTToken | any;
-          try {
-            decodedToken = this.decodeToken(user.token);
-          } catch (error) {
-            this.snackBar.open('Vous n\'êtes pas autorisé à vous connecter', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
-            return;
-          }
-
-          user.offer = decodedToken.offer;
-
-          // User roles
-          user.roles = [];
-          for (let role of decodedToken.roles) {//this.getUserRolesFromToken(user)
-            user.roles.push({ name: role });
-          }
-
-          // User details
-          if (decodedToken.creation_date) {
-            user.creationDate = new Date(decodedToken.creation_date * 1000);
-          }
-          user.accountActive = decodedToken.account_active;
-
-          // User preferences
-          user.darkModeEnabled = decodedToken.dark_mode_enabled;
-
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-
-          if (redirect) {
-            if (this.route.snapshot.queryParams['returnUrl']) {
-              // Redirect to redirectUrl
-              this.router.navigateByUrl(this.route.snapshot.queryParams['returnUrl']);
+              this.router.navigate(['/otplogin'], {
+                state: {
+                  user: user
+                }
+              });
               return;
             }
 
-            if (!this.isUserAdmin()) {
-              // Redirect to home page
-              this.router.navigate(['/']);
-            } else {
-              this.router.navigate(['/admin']);
+            user.token = resp;
+            // Reset password to hide it in localStorage
+            user.password = '';
+
+            let decodedToken: JWTToken | any;
+            try {
+              decodedToken = this.decodeToken(user.token);
+            } catch (error) {
+              this.snackBar.open('Vous n\'êtes pas autorisé à vous connecter', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+              return;
+            }
+
+            user = this.updateUser(user, decodedToken);
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            this.currentUserSubject.next(user);
+
+            if (redirect) {
+              if (this.route.snapshot.queryParams['returnUrl']) {
+                // Redirect to redirectUrl
+                this.router.navigateByUrl(this.route.snapshot.queryParams['returnUrl']);
+                return;
+              }
+
+              if (!this.isUserAdmin()) {
+                // Redirect to home page
+                this.router.navigate(['/']);
+              } else {
+                this.router.navigate(['/admin']);
+              }
             }
           }
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      });
+        ),
+        catchError((error) => throwError(() => {
+          console.log(error);
+          this.snackBar.open('Identifiants invalides', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+        }))
+      )
   }
 
   logout(returnUrl: string | null = null): void {
@@ -154,6 +160,10 @@ export class AuthService {
     return this.http.post<any>(this.apiBaseUrl + 'api/auth/resetpassword', email);
   }
 
+  updatePassword(oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(this.apiBaseUrl + 'api/auth/editpassword', { oldPassword: oldPassword, newPassword: newPassword });
+  }
+
   saveRefreshToken(token: JWTToken): void {
     let user = this.currentUserValue;
     if (!user || !token) {
@@ -163,6 +173,13 @@ export class AuthService {
     }
 
     user.token = token;
+
+    // Refresh user details in token
+    let decodedToken: JWTToken | any = this.decodeToken(token);
+
+    // Update user details from token
+    user = this.updateUser(user, decodedToken);
+
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);// = new BehaviorSubject<User | null>(user);
   }
@@ -191,6 +208,33 @@ export class AuthService {
 
   private decodeToken(token: JWTToken): any {
     return jwt_decode(token.accessToken);
+  }
+
+  /**
+   * Update user details from token
+   *
+   * @param user User to update
+   * @param decodedToken Token for updating user details
+   */
+  updateUser(user: User, decodedToken: JWTToken | any): User {
+    // User roles
+    user.roles = [];
+    for (let role of decodedToken.roles) {//this.getUserRolesFromToken(user)
+      user.roles.push({ name: role });
+    }
+
+    // User details
+    if (decodedToken.creation_date) {
+      user.creationDate = new Date(decodedToken.creation_date * 1000);
+    }
+    user.accountActive = decodedToken.account_active;
+    user.offer = decodedToken.offer;
+    console.log(user.offer);
+
+    // User preferences
+    user.darkModeEnabled = decodedToken.dark_mode_enabled;
+
+    return user;
   }
 
   // private getUserRolesFromToken(user: User): string[] {

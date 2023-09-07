@@ -32,3 +32,10 @@
 .auth-form-item {
   margin-bottom: 16px;
 }
+
+.auth-form-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}

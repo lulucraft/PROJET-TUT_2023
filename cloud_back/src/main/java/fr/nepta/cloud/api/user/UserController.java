@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor @Slf4j
 //@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
+@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
 @RequestMapping("api/user/")
 public class UserController {
@@ -116,8 +117,8 @@ public class UserController {
 	////		us.addCongeToUser(us.getUser(auth.getName()), conge);
 	//	}
 
-	@RolesAllowed("USER")
-	@PostMapping(value = "deletefile", consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RolesAllowed({"USER","ADMIN"})
+	@DeleteMapping(value = "deletefile", produces = MediaType.APPLICATION_JSON_VALUE)//, consumes = "application/json"
 	public String removeFile(@RequestBody long fileId) throws Exception {
 		//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		//		us.removeFileFromUser(us.getUser(auth.getName()), fileId);
@@ -185,6 +186,7 @@ public class UserController {
 
 		// Add order to authenticated user from his username
 		us.addOrderToUser(user, order);
+		// Ajout/changement offre utilisateur
 		us.setOffer(user, order.getOffer());
 	}
 

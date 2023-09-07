@@ -41,7 +41,7 @@ export class DataService {
     return this.http.get<File[]>(this.apiBaseUrl + 'api/user/files');
   }
 
-  async addFile(file: File, fileData: globalThis.File): Promise<void> {
+  async addFile(file: File, fileData: globalThis.File): Promise<number | undefined | null> {
     let hash = await this.generateFileHash(fileData).then((hash: string | null) => {
       if (hash === null) {
         alert("Erreur lors de la génération du hash du fichier");
@@ -50,7 +50,7 @@ export class DataService {
       return hash;
     });
     if (hash === null) {
-      return;
+      return null;
     }
 
     // Set hash before sending to server
@@ -61,7 +61,7 @@ export class DataService {
     let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/file', file));
     if (dbFile == null) {
       alert("Erreur lors de la sauvegarde du fichier dans la base de données");
-      return;
+      return null;
     }
 
     let formData = new FormData();
@@ -75,6 +75,8 @@ export class DataService {
     this.http.put(this.apiBaseUrl + 'api/user/filedata', formData).subscribe((data: any) => {
       console.log(data);
     });
+
+    return dbFile.id;
   }
 
   downloadFile(file: File) {
@@ -101,8 +103,8 @@ export class DataService {
     return this.http.post(this.apiBaseUrl + 'api/admin/editfile', file);
   }
 
-  deleteFile(fileName: string): Observable<any> {
-    return this.http.post(this.apiBaseUrl + 'api/admin/deletefile', fileName);
+  deleteFile(fileId: number): Observable<any> {
+    return this.http.delete(this.apiBaseUrl + 'api/user/deletefile', { body: fileId });
   }
 
 

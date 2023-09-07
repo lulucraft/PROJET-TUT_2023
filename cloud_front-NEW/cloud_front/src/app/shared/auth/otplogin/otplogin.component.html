@@ -1,0 +1,21 @@
+<div id="center" class="auth-form frame darkModeAuto">
+  <h2>Double authentification</h2>
+  <p>Un code d'authentification à deux facteurs vous a été envoyé par email.</p>
+
+  <form [formGroup]="otpForm" (ngSubmit)="loginOTP()">
+    <div class="auth-form-inputs auth-form-item">
+      <div class="auth-form-input">
+        <mat-form-field>
+          <mat-icon aria-hidden="true" matIconPrefix>key</mat-icon>
+          <input matInput type="text" placeholder="Code reçu par email" formControlName="otpcode" required />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="auth-form-item">
+      <p>
+        <button mat-flat-button color="primary" type="submit" [disabled]="!otpForm.valid">Se connecter</button>
+      </p>
+    </div>
+  </form>
+</div>

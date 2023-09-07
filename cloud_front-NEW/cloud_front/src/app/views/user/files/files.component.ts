@@ -82,18 +82,20 @@ export class FilesComponent implements OnInit, AfterViewInit {
     return this.authService.isUserAdmin();
   }
 
-  // demandeConges(): void {
-  //   this.router.navigate(['/main/congesrequest']);
-  // }
+  deleteFile(file: File): void {
+    if (!file.id) {
+      // TODO: Error message
+      return;
+    }
+    let fileId: number = file.id;
 
-  deleteFile(fileName: string): void {
-    this.dataService.deleteFile(fileName)
+    this.dataService.deleteFile(fileId)
       .subscribe({
         next: (resp: string) => {
           console.info(resp);
 
           // Remove file request from unfilter files list
-          this.files = this.files!.filter(c => c.name !== fileName);
+          this.files = this.files!.filter(c => c.id !== fileId);
         },
         error: (err: any) => {
           console.error(err);
@@ -110,8 +112,20 @@ export class FilesComponent implements OnInit, AfterViewInit {
       let file: globalThis.File = files[i];
       console.info(file)
 
-      this.dataService.addFile({ name: file.name, creationDate: new Date(), size: file.size }, file).then(data => {
-        console.info(data);
+      let creationDate: Date = new Date();
+      this.dataService.addFile({ name: file.name, creationDate: creationDate, size: file.size }, file).then(fileId => {
+        if (fileId === undefined) {
+          // file.id === undefined après requête 'api/user/file'
+          console.error("Erreur lors de l'enregistrement du fichier dans la base de données");
+          return;
+        } else if (!fileId) {
+          console.error("Erreur lors de la tentative de l'enregistrement du fichier en base");
+          return;
+        }
+        console.info(fileId);
+
+        // Ajout du fichier dans le table
+        this.files?.push({ id: fileId, name: file.name, creationDate: creationDate, size: file.size })
       });
     }
   }

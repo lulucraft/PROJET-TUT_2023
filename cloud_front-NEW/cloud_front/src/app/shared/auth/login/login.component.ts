@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/services/auth.service';
 export class LoginComponent {
 
   public loginForm: FormGroup;
+  public loginInProgress: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {
     if (this.authService.isAuthenticated()) {
@@ -31,7 +32,18 @@ export class LoginComponent {
     let username: string = this.loginForm.controls["username"].value;
     let password: string = this.loginForm.controls["password"].value;
     if (username && password) {
-      this.authService.login({ username: username, password: password });
+      this.loginInProgress = true;
+      this.authService.login({ username: username, password: password }).subscribe({
+        next: () => {
+          // Login ok
+          this.loginInProgress = false;
+        },
+        error: (error) => {
+          // Login error
+          console.error(error);
+          this.loginInProgress = false;
+        }
+      });
     }
   }
 

@@ -12,8 +12,6 @@ public interface UserService {
 
 	User saveUser(User user);
 
-//	Role saveRole(Role role);
-
 	void addRoleToUser(User user, Role role);
 
 	void addRoleToUser(String username, String roleName);
@@ -24,8 +22,6 @@ public interface UserService {
 
 	User getUser(long userId) throws Exception;
 
-//	void addCongeToUser(User user, Conge conge);
-
 	void setDarkMode(User user, boolean darkModeEnabled) throws Exception;
 
 	void editUser(User user) throws Exception;
@@ -34,8 +30,10 @@ public interface UserService {
 
 	User getUserFromEmail(String email) throws Exception;
 
-	void addOrderToUser(User user, Order order);
+	void addOrderToUser(User user, Order order) throws Exception;
 
 	void setOffer(User user, Offer offer);
+
+//	List<Order> getOrdersNotArchivedByUser(User user);
 
 }

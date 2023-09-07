@@ -27,3 +27,19 @@ Notes :
     -> si modif du fichier sur le serveur fichier... -> hash devient différent de la BDD -> serveur de fichier piraté ??
 - Utilisateur qui ne peut que lire et insérer dans la BDD -> la modification des fichiers ne se fait qu'en ajoutant
     une nouvelle ligne d'historique dans la BDD
+
+
+2FA
+MDP oublié
+
+plusieurs thèmes du site
+UML
+
+
+
+#ff4081
+#ce40ff
+
+#ffba40
+#368f38
+

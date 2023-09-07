@@ -21,10 +21,10 @@ export class RegisterComponent implements OnInit {
   constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
 
   ngOnInit(): void {
-    // Redirect to main page if already authenticated (register page should not be accessible if already authenticated)
+    // Redirect to user page if already authenticated (register page should not be accessible if already authenticated)
     if (this.authService.isAuthenticated()) {
       if (!this.authService.isUserAdmin()) {
-        this.router.navigate(['/main']);
+        this.router.navigate(['/user']);
       } else {
         this.router.navigate(['/admin']);
       }

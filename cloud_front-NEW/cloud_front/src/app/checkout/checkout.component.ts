@@ -9,6 +9,7 @@ import { DataService, countries } from '../services/data.service';
 import { MatStepper } from '@angular/material/stepper';
 import { Observable } from 'rxjs/internal/Observable';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { JWTToken } from '../models/jwt-token';
 
 @Component({
   selector: 'app-checkout',
@@ -189,7 +190,7 @@ export class CheckoutComponent implements OnInit {
     this.payPalConfig = {
       currency: 'EUR',
       clientId: 'AaD_eArL3lImSsUm6EPqC1XPhS6TZ1wkNt7DEamO8lUUJw9xQ1gf-_qvW4iAeFu3VZsJR61-NN5Qo1AF',
-      createOrderOnClient: (data) => <ICreateOrderRequest> {
+      createOrderOnClient: (data) => <ICreateOrderRequest>{
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
@@ -258,10 +259,17 @@ export class CheckoutComponent implements OnInit {
           date: new Date()
           // products: paypalProducts
         }).subscribe(() => {
-          // Refresh token to get new user details on token (with offer)
-          this.authService.refreshTokenRequest().subscribe(() => {
-            console.log("User offer updated");
-            this.snackBar.open('Votre compte a été mis à jour', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+          // Refresh token to set new offer in user token
+          this.authService.refreshTokenRequest().subscribe({
+            next: (token: JWTToken) => {
+              this.authService.saveRefreshToken(token);
+              console.log("User offer updated");
+              this.snackBar.open('Votre compte a été mis à jour', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+            },
+            error: () => {
+              this.authService.logout();
+              this.snackBar.open('Veuillez vous reconnecter pour mettre à jour votre compte', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            }
           });
         });
 

@@ -12,6 +12,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +49,7 @@ public class AuthController {
 	private final UserService us;
 
 	@Autowired
-	private final MailService mails;
+	private final MailService mailS;
 
 	@GetMapping(value = "refreshtoken")//consumes = "application/json", 
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
@@ -67,6 +70,7 @@ public class AuthController {
 						.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
 						.withIssuer(request.getRequestURI().toString())
 						.withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+						.withClaim("offer", user.getOffer() != null ? user.getOffer().getName() : null)
 						.sign(algo);
 
 				refreshToken = JWT.create()
@@ -128,21 +132,43 @@ public class AuthController {
 
 		us.saveUser(user);
 		// Send mail to user which contains the new password
-		mails.sendMail(email, newPassword);
+		mailS.sendNewPasswordMail(email, newPassword);
+	}
+
+	private static class EditPasswordData {
+		public String oldPassword, newPassword;
+	}
+
+	@PostMapping(value = "editpassword")
+	public void editPassword(@RequestBody EditPasswordData editPasswordData) throws Exception {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		if (user == null) return;
+
+		if (!BCrypt.checkpw(editPasswordData.oldPassword, user.getPassword())) {
+			log.error("L'ancien mot de passe ne correspond pas");
+			return;
+		}
+
+		user.setPassword(editPasswordData.newPassword);// Password auto encoded with bcrypt
+
+		us.saveUser(user);
+
+		log.info("Password of user '{}' updated", user.getId());
 	}
 
 	private Stream<Character> getRandomSpecialChars(int count) {
-	    Random random = new SecureRandom();
-	    IntStream specialChars = random.ints(count, 33, 45);
-	    return Stream.concat(specialChars.mapToObj(data -> (char) data), Stream.of((char) (new Random().nextInt(26) + 'a')));
+		Random random = new SecureRandom();
+		IntStream specialChars = random.ints(count, 33, 45);
+		return Stream.concat(specialChars.mapToObj(data -> (char) data), Stream.of((char) (new Random().nextInt(26) + 'a')));
 	}
 
-//	@PostMapping(value = "login", consumes = "application/json", produces = "application/json")
-//	public ResponseEntity<String> authenticateUser(@RequestBody User user) {
-//		System.err.println(user.getUsername());
-//		System.err.println(user.getPassword());
-//
-//		return ResponseEntity.ok().body("test");
-//	}
+	//	@PostMapping(value = "login", consumes = "application/json", produces = "application/json")
+	//	public ResponseEntity<String> authenticateUser(@RequestBody User user) {
+	//		System.err.println(user.getUsername());
+	//		System.err.println(user.getPassword());
+	//
+	//		return ResponseEntity.ok().body("test");
+	//	}
 
 }

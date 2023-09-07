@@ -59,7 +59,7 @@ public class CloudApplication {
 				Set<String> disadvantages = new HashSet<>();
 				disadvantages.add("Pas de partage de fichiers");
 
-				os.saveOffer(new Offer(null, "Particulier", 10, advantages, disadvantages));
+				os.saveOffer(new Offer(null, "Particulier", 10, 1, advantages, disadvantages));
 			}
 
 			if (os.getOffer("Professionnel") == null) {
@@ -68,7 +68,7 @@ public class CloudApplication {
 				advantages.add("Tous les formats de fichiers");
 				advantages.add("Partage fichiers illimité");
 
-				os.saveOffer(new Offer(null, "Professionnel", 20, advantages, new HashSet<>()));
+				os.saveOffer(new Offer(null, "Professionnel", 20, 1, advantages, new HashSet<>()));
 			}
 
 			// Create default users

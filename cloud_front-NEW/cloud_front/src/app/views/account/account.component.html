@@ -14,7 +14,8 @@
     <p>
       <mat-form-field [floatLabel]="'always'">
         <mat-label>Date création compte</mat-label>
-        <input matInput type="text" [value]="user.creationDate ? (user.creationDate | date: 'dd/MM/YYYY HH:mm:ss' : 'GMT') : 'Aucune'" readonly />
+        <input matInput type="text"
+          [value]="user.creationDate ? (user.creationDate | date: 'dd/MM/YYYY HH:mm:ss' : 'GMT') : 'Aucune'" readonly />
       </mat-form-field>
     </p>
 
@@ -32,6 +33,11 @@
         <mat-label>Offre souscrite</mat-label>
         <input matInput type="text" [value]="user.offer ? user.offer : 'Aucune'" readonly />
       </mat-form-field>
+    </p>
+
+    <!-- Modification mot de passe -->
+    <p>
+      <button mat-stroked-button (click)="openPopupEditPassword()">Modifier votre mot de passe</button>
     </p>
   </div>
 </div>

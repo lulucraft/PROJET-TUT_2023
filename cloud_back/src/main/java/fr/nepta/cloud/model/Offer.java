@@ -31,11 +31,15 @@ public class Offer {
 	@Column(name = "price")
 	private long price;
 
+	// In months
+	@Column(name = "duration")
+	private int duration;
+
 	@ElementCollection//(targetClass = String.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "advantages", joinColumns = @JoinColumn(name = "id"))
 	@Column(name = "label", nullable = false)
 	private Set<String> advantages;
-	
+
 	@ElementCollection//(targetClass = String.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "disadvantages", joinColumns = @JoinColumn(name = "id"))
 	@Column(name = "label", nullable = false)

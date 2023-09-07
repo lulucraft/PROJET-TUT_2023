@@ -10,14 +10,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-@Entity
+@Entity(name = "order")
 @Table(name = "`order`")
 public class Order {
 
@@ -25,7 +26,7 @@ public class Order {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "paypal_id")
+	@Column(name = "paypal_id", unique = true)
 	private String paypalId;
 
 	@Column(name = "order_date", nullable = false)
@@ -33,7 +34,16 @@ public class Order {
 	private Date date;
 
 //	@Column(name = "offer_id")
-	@OneToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Offer offer;
 
+	@Column(name = "quantity", nullable = false)
+	private int quantity;
+
+	@Column(name = "archived", nullable = false, columnDefinition="tinyint(1) default 0")
+	private boolean archived;
+
+//	@ManyToOne(targetEntity = User.class)
+////	@JoinColumn(name = "user_id")
+//	private User userRef;
 }

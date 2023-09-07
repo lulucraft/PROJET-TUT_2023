@@ -56,7 +56,7 @@ export class SidebarLeftComponent implements OnInit {
 
   files(): void {
     this.appHeader.leftMenuOpened = false;
-    this.router.navigate(['/main/files']);
+    this.router.navigate(['/user/files']);
   }
 
   adminComptes(): void {
