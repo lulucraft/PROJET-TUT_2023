@@ -70,12 +70,15 @@ public class AuthController {
 						.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
 						.withIssuer(request.getRequestURI().toString())
 						.withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+						.withClaim("creation_date", user.getCreationDate())
+						.withClaim("dark_mode_enabled", user.isDarkModeEnabled())
+						.withClaim("account_active", user.isAccountActive())
 						.withClaim("offer", user.getOffer() != null ? user.getOffer().getName() : null)
 						.sign(algo);
 
 				refreshToken = JWT.create()
 						.withSubject(user.getUsername())
-						.withExpiresAt(new Date(System.currentTimeMillis() + 40 * 60 * 1000))
+						.withExpiresAt(new Date(System.currentTimeMillis() + 40 * 2 * 60 * 1000))
 						.withIssuer(request.getRequestURI().toString())
 						.sign(algo);
 

@@ -3,6 +3,8 @@ package fr.nepta.cloud.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,6 +14,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -61,7 +65,7 @@ public class User implements Cloneable {
 	//	@Column(name = "refresh_token")
 	//	private String refreshToken;
 
-//	@Column(name = "offer_id")
+	//	@Column(name = "offer_id")
 	@OneToOne
 	private Offer offer;
 
@@ -72,7 +76,15 @@ public class User implements Cloneable {
 	private Collection<Role> roles = new ArrayList<>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "user_files",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "files_id")
+			)
 	private Collection<File> files = new ArrayList<>();
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	private Set<UserShareRight> userShareRights = new HashSet<>();
 
 	@Override
 	public User clone() throws CloneNotSupportedException {

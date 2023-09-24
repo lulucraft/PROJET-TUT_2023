@@ -14,6 +14,7 @@ import { CheckoutComponent } from './checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
 import { CgvComponent } from './shared/cgv/cgv.component';
 import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
+import { UsersComponent } from './views/user/users/users.component';
 
 @Injectable({ providedIn: 'root' })
 export class TemplatePageTitleStrategy extends TitleStrategy {
@@ -38,6 +39,7 @@ const routes: Routes = [
     children: [
       { path: '', component: HomeUserComponent },
       // { path: 'account', component: AccountComponent },
+      { path: 'users', component: UsersComponent },
       { path: 'files', component: FilesComponent }
     ]
   },

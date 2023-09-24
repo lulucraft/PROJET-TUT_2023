@@ -27,7 +27,7 @@
             <button mat-menu-item (click)="downloadFiles(selection)">
               <mat-icon color="primary" [matBadge]="selection.selected.length" matBadgeColor="primary" matBadgeSize="small">download</mat-icon>Télécharger
             </button>
-            <button mat-menu-item>
+            <button mat-menu-item (click)="deleteFiles(selection)">
               <mat-icon color="warn" [matBadge]="selection.selected.length" matBadgeColor="warn" matBadgeSize="small">delete</mat-icon>Supprimer
             </button>
           </mat-menu>

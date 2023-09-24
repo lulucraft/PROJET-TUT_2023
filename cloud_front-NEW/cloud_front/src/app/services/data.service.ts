@@ -8,6 +8,8 @@ import { Buffer } from 'buffer';
 import { Offer } from '../models/offer';
 import { Country } from '../models/country';
 import { Order } from '../models/order';
+import { UserShareRight } from '../models/user-share-right';
+import { Right } from '../models/right';
 
 @Injectable({
   providedIn: 'root'
@@ -66,13 +68,13 @@ export class DataService {
 
     let formData = new FormData();
     let blob = new Blob([fileData]);//, { type: 'application/octet-stream' }
-    formData.append('mpFile', blob);
-    formData.append('hash', file.hash);
+    formData.append('fileData', blob);
+    // formData.append('hash', file.hash);
     console.log(blob);
 
     // , { headers: new HttpHeaders({ 'Content-Type': "multipart/form-data" })}
     // Send and save file on the server
-    this.http.put(this.apiBaseUrl + 'api/user/filedata', formData).subscribe((data: any) => {
+    this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, { params: { fileHash: file.hash } }).subscribe((data: any) => {//, file: file
       console.log(data);
     });
 
@@ -85,15 +87,35 @@ export class DataService {
       return;
     }
 
-    let params: HttpParams = new HttpParams();
-    params.set("id", file.id.toString());
-
-    this.http.get<ArrayBuffer>(this.apiBaseUrl + 'api/user/file/download', { params: params }).subscribe((data: ArrayBuffer) => {
-      this.downloadFileFromData(data);
+    this.http.get(this.apiBaseUrl + 'api/user/file/download', { params: { file_id: file.id }, responseType: 'blob' }).subscribe((data: any) => {
+      this.downloadFileFromData(file.name, data);
     });
   }
 
-  sendOrder(order: Order) {
+  // Rights
+  getRights(): Observable<Right[]> {
+    return this.http.get<Right[]>(this.apiBaseUrl + 'api/user/rights');
+  }
+
+  getUsersSharedRights(): Observable<UserShareRight[]> {
+    return this.http.get<UserShareRight[]>(this.apiBaseUrl + 'api/user/userssharedrights');
+  }
+
+  addUserShare(username: string): Observable<UserShareRight> {
+    return this.http.post<UserShareRight>(this.apiBaseUrl + 'api/user/usershare', username);
+  }
+
+  enableRight(userShareRight: UserShareRight, right: Right, enable: boolean): Observable<UserShareRight> {
+    let params = {
+      user_share_right_id: userShareRight.id,
+      right_id: right.id,
+      enable: enable
+    };
+    return this.http.post<UserShareRight>(this.apiBaseUrl + 'api/user/enableright', userShareRight, { params });
+  }
+
+  // Order
+  sendOrder(order: Order): Observable<Order> {
     return this.http.post<Order>(this.apiBaseUrl + 'api/user/order', order);
   }
 
@@ -121,10 +143,29 @@ export class DataService {
   }
 
 
-  downloadFileFromData(data: BlobPart) {
-    const blob = new Blob([data]);//, { type: 'text/csv' }
+  // downloadFileFromData(data: BlobPart): void {
+  //   const blob = new Blob([data]);//, { type: 'text/csv' }
+  //   const url = window.URL.createObjectURL(blob);
+  //   window.open(url);
+  // }
+
+  // downloadFile1(filePath: string) {
+  //   let link = document.createElement('a');
+  //   link.href = filePath;
+  //   link.download = filePath.substr(filePath.lastIndexOf('/') + 1);
+  //   link.click();
+  // }
+
+  downloadFileFromData(fileName: string, data: BlobPart): void {
+    const blob = new Blob([data]);
     const url = window.URL.createObjectURL(blob);
-    window.open(url);
+    // window.open(url, "_blank");
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;//url.substr(url.lastIndexOf('/') + 1)
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   async generateFileHash(file: globalThis.File): Promise<string | null> {

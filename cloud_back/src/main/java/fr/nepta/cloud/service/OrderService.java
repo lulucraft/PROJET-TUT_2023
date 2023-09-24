@@ -1,9 +1,6 @@
 package fr.nepta.cloud.service;
 
-import java.util.List;
-
 import fr.nepta.cloud.model.Order;
-import fr.nepta.cloud.model.User;
 
 public interface OrderService {
 

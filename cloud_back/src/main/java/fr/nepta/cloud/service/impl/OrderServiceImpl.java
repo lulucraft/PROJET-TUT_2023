@@ -1,13 +1,10 @@
 package fr.nepta.cloud.service.impl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.nepta.cloud.model.Order;
-import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.repository.OrderRepo;
 import fr.nepta.cloud.service.OrderService;
 import lombok.RequiredArgsConstructor;

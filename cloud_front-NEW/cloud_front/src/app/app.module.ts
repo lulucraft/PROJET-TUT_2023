@@ -29,6 +29,8 @@ import { NgxPayPalModule } from 'ngx-paypal';
 import { CgvComponent } from './shared/cgv/cgv.component';
 import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
 import { EditPasswordComponent } from './shared/auth/edit-password/edit-password.component';
+import { UsersComponent } from './views/user/users/users.component';
+import { EnterUserComponent } from './views/user/users/enter-user/enter-user.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -53,7 +55,9 @@ registerLocaleData(localeFr, 'fr-FR');
     ResetPasswordComponent,
     CgvComponent,
     OTPloginComponent,
-    EditPasswordComponent
+    EditPasswordComponent,
+    UsersComponent,
+    EnterUserComponent
   ],
   imports: [
     BrowserModule,

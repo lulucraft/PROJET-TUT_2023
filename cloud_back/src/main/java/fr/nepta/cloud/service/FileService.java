@@ -3,6 +3,7 @@ package fr.nepta.cloud.service;
 import java.util.Collection;
 
 import fr.nepta.cloud.model.File;
+import fr.nepta.cloud.model.User;
 
 public interface FileService {
 
@@ -13,5 +14,7 @@ public interface FileService {
 	File getFile(long id);
 
 	File getFile(String string);
+
+	User getFileOwner(long fileId);
 
 }

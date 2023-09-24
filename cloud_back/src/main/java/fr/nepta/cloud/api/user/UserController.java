@@ -1,11 +1,15 @@
 package fr.nepta.cloud.api.user;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,15 +24,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.nepta.cloud.SFTPConfig.UploadFileData;
+import fr.nepta.cloud.SFTPConfig.UploadGateway;
 import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
+import fr.nepta.cloud.model.Right;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.model.UserShareRight;
 import fr.nepta.cloud.service.FileService;
 import fr.nepta.cloud.service.OfferService;
 import fr.nepta.cloud.service.OrderService;
 import fr.nepta.cloud.service.PayPalService;
+import fr.nepta.cloud.service.RightService;
 import fr.nepta.cloud.service.UserService;
+import fr.nepta.cloud.service.UserShareRightService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +58,13 @@ public class UserController {
 	private final OfferService os;
 	@Autowired
 	private final OrderService ors;
+	@Autowired
+	private final RightService rgts;
+	@Autowired
+	private final UserShareRightService usrs;
+
+	@Autowired
+	private final UploadGateway sftpUploadGateway;
 
 	//	@GetMapping(value = "users")
 	//	public String getUsers() {
@@ -58,7 +75,7 @@ public class UserController {
 	@GetMapping(value = "files")
 	public Collection<File> getFiles() {//@RequestParam String username
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return us.getUser(auth.getName()).getFiles();
+		return us.getUser(auth.getName()).getFiles().stream().filter(f -> f.isArchived() == false).toList();
 	}
 
 	@RolesAllowed({"USER","ADMIN"})
@@ -66,7 +83,7 @@ public class UserController {
 	public File addFile(@RequestBody File file) {//@RequestBody File file
 		log.info("Saving file {} on the database", file.getId());
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash()));
+		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash(), false));
 		try {
 			us.addFileToUser(us.getUser(auth.getName()), f);
 		} catch (Exception e) {
@@ -75,24 +92,154 @@ public class UserController {
 		return f;
 	}
 
+	//	private static class UploadFileData {
+	//		public File file;
+	//	}
+
 	@RolesAllowed({"USER","ADMIN"})
-	@PutMapping(value = "filedata")
-	public File uploadFile(@RequestBody MultipartFile mpFile) {//@RequestBody File file
-		System.err.println(mpFile);
+	@PutMapping(value = "filedata")//UploadFileData uploadFileData
+	public File uploadFile(@RequestBody MultipartFile fileData, @RequestParam String fileHash) throws IOException {//, @RequestParam String fileHash @RequestBody File file
 		// Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		// Sauvegarde du fichier sur le disque
 		// TODO
-		return null;
+		////		Path tempFile = null;
+		////		try {
+		////			tempFile = Files.createTempFile(mpFile.getName(), fileHash);
+		////		} catch (IOException e1) {
+		////			e1.printStackTrace();
+		////		}
+		////		if (tempFile == null) {
+		////			log.error("Fichier '{}' null", mpFile.getName());
+		////			return null;
+		////		}
+		//
+		////		java.io.File file = tempFile.toFile();//new java.io.File(mpFile.getName());
+		//		java.io.File file = new java.io.File(mpFile.getName());
+		//		try {
+		//			// Put mpFile data into tempFile data
+		//			mpFile.transferTo(file);
+		//		} catch (IllegalStateException | IOException e) {
+		//			e.printStackTrace();
+		//		}
+		//		System.err.println(file.getAbsolutePath());
+		//		System.err.println(file.getPath());
+		////		sftpUploadGateway.read("/data/");
+		System.err.println(fileHash);
+		UploadFileData ufd = new UploadFileData();
+		ufd.mpFile = fileData;
+		//		ufd.file = file;
+		File file = fs.saveFile(new File(null, fileData.getName(), new Date(), null, fileData.getSize(), fileHash, false));
+		ufd.fileName = String.valueOf(file.getId());
+		sftpUploadGateway.upload(ufd);
+		return file;
 	}
 
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "file/download")
-	public File downloadFile(@RequestBody File file) {
-		// Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		fs.getFile(file.getId());
-		return null;
+	public byte[] downloadFile(@RequestParam(name = "file_id") long fileId) throws IOException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		User fileOwner = fs.getFileOwner(fileId);
+		InputStream inputStream = null;
+
+		if (fileOwner == user) {
+			inputStream = sftpUploadGateway.downloadFile(fileId);			
+		}
+
+		if (inputStream == null) {
+			Right downloadRight = rgts.getRight("Télécharger");
+			UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
+			// If user is in the shared user && If user has download right
+			if (fileOwner.getUserShareRights().contains(usr) && usr.getRights().contains(downloadRight)) {
+				//user.getFiles().contains(fs.getFile(file.getId()))
+				inputStream = sftpUploadGateway.downloadFile(fileId);
+			}
+		}
+
+		return IOUtils.toByteArray(inputStream);
 	}
 
+	@RolesAllowed({"USER","ADMIN"})
+	@DeleteMapping(value = "deletefile", produces = MediaType.APPLICATION_JSON_VALUE)//, consumes = "application/json"
+	public String removeFile(@RequestBody long fileId) throws Exception {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		User fileOwner = fs.getFileOwner(fileId);
+		boolean hasRight = false;
+
+		if (fileOwner == user) {
+			hasRight = true;
+		}
+
+		if (!hasRight) {
+			Right deleteRight = rgts.getRight("Supprimer");
+			UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
+			if (deleteRight == null || !usr.getRights().contains(deleteRight)) {
+				return null;
+			}
+		}
+
+		us.archiveUserFile(user, fileId);
+		sftpUploadGateway.archiveFile(fileId);
+		return "{\"message\":\"Le fichier a été supprimé\"}";
+	}
+
+	// Rights
+	@RolesAllowed({"USER","ADMIN"})
+	@GetMapping(value = "rights")
+	public Collection<Right> getRights() {
+		return rgts.getRights();
+	}
+
+	@RolesAllowed({"USER","ADMIN"})
+	@GetMapping(value = "userssharedrights")
+	public Collection<UserShareRight> getUsersSharedRights() {
+		return usrs.getUsersSharedRights();
+	}
+
+	@RolesAllowed({"USER","ADMIN"})
+	@PostMapping(value = "enableright")
+	public UserShareRight enableRight(@RequestParam(name = "user_share_right_id") long userShareRightId, @RequestParam(name = "right_id") long rightId, @RequestParam boolean enable) {
+		UserShareRight userShareRight = usrs.getUserShareRight(userShareRightId);
+		if (userShareRight == null) {
+			log.error("user_share_right '{}' not found in the database", userShareRightId);
+			return null;
+		}
+
+		Right right = rgts.getRight(rightId);
+		if (right == null) {
+			log.error("Right '{}' not found in the database", rightId);
+			return null;
+		}
+
+		if (enable) {
+			return usrs.addRightToUserShareRight(userShareRight, right);
+		} else {
+			return usrs.removeRightToUserShareRight(userShareRight, right);
+		}
+	}
+
+	@RolesAllowed({"USER","ADMIN"})
+	@PostMapping(value = "usershare")
+	public UserShareRight shareToUser(@RequestBody String username) {
+		User userShare = us.getUser(username);
+		// If the target user to share is null
+		if (userShare == null) {
+			log.error("User '{}' not found for sharing", username);
+			return null;
+		}
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth.getName().equalsIgnoreCase(username)) {
+			throw new IllegalStateException("Impossible de partager des droits à soi-même");
+		}
+		User user = us.getUser(auth.getName());
+
+		//usrs.saveUserShareRight(usr);
+		return usrs.shareRightsToUser(user, userShare, null);
+	}
+
+	// OFFERS
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "offers")
 	public Collection<Offer> getOffers() {
@@ -116,14 +263,6 @@ public class UserController {
 	//		// Add conges request from username of authenticated user
 	////		us.addCongeToUser(us.getUser(auth.getName()), conge);
 	//	}
-
-	@RolesAllowed({"USER","ADMIN"})
-	@DeleteMapping(value = "deletefile", produces = MediaType.APPLICATION_JSON_VALUE)//, consumes = "application/json"
-	public String removeFile(@RequestBody long fileId) throws Exception {
-		//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		//		us.removeFileFromUser(us.getUser(auth.getName()), fileId);
-		return "{\"message\":\"Le fichier a été supprimé\"}";
-	}
 
 	//	@RolesAllowed({"USER","ADMIN"})
 	//	@GetMapping(value = "newusers")

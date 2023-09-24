@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { File } from 'src/app/models/file';
@@ -35,7 +35,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
   // public filterNotValidated: string = 'all';
 
 
-  constructor(private dataService: DataService, private router: Router, private authService: AuthService) { }
+  constructor(private dataService: DataService, private router: Router, private authService: AuthService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
   }
@@ -96,12 +96,41 @@ export class FilesComponent implements OnInit, AfterViewInit {
 
           // Remove file request from unfilter files list
           this.files = this.files!.filter(c => c.id !== fileId);
+          this.filesCpt = this.files;
+          this.filesDataSource.data = this.filesCpt;
         },
         error: (err: any) => {
           console.error(err);
           alert("Erreur lors de la suppression du fichier");
         }
       });
+  }
+
+  deleteFiles(files: SelectionModel<File>): void {
+    for (let file of files.selected) {
+      if (!file.id) {
+        this.snackBar.open('Le fichier ' + file.name + ' est invalide', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+        continue;
+      }
+
+      let fileId: number = file.id;
+
+      this.dataService.deleteFile(fileId)
+        .subscribe({
+          next: (resp: string) => {
+            console.info(resp);
+
+            // Remove file request from unfilter files list
+            this.files = this.files!.filter(c => c.id !== fileId);
+            this.filesCpt = this.files;
+            this.filesDataSource.data = this.filesCpt;
+          },
+          error: (err: any) => {
+            console.error(err);
+            alert("Erreur lors de la suppression du fichier");
+          }
+        });
+    }
   }
 
   addFile(event: any): void {

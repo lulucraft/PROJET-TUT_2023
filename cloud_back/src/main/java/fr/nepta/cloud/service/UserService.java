@@ -34,6 +34,10 @@ public interface UserService {
 
 	void setOffer(User user, Offer offer);
 
+	void archiveUserFile(User user, long fileId) throws Exception;
+
+//	void removeFileFromUser(User user, long fileId) throws Exception;
+
 //	List<Order> getOrdersNotArchivedByUser(User user);
 
 }

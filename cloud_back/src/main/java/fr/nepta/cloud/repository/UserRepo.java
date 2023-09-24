@@ -1,11 +1,7 @@
 package fr.nepta.cloud.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.User;
 
 public interface UserRepo extends JpaRepository<User, Long> {

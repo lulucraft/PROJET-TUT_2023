@@ -28,7 +28,7 @@ export class AccountComponent implements OnInit {
 
   openPopupEditPassword(): void {
     this.dialog.open(EditPasswordComponent, {
-      data: { password: 'test' },
+      // data: { password: 'test' },
     });
   }
 

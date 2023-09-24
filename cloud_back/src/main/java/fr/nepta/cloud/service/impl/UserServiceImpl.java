@@ -20,6 +20,7 @@ import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.repository.FileRepo;
 import fr.nepta.cloud.repository.OrderRepo;
 import fr.nepta.cloud.repository.RoleRepo;
 import fr.nepta.cloud.repository.UserRepo;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	private final UserRepo userRepo;
 	private final RoleRepo roleRepo;
 	private final OrderRepo orderRepo;
+	private final FileRepo fileRepo;
 	private final PasswordEncoder passEncoder;
 
 	@Override
@@ -165,7 +167,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			return;
 		}
 
-		if (checkUserOffer(user) == false) {
+		if (checkUserOffer(user) == true) {
+			// Révocation de l'offre de l'utilisateur si offre expirée
 			user.setOffer(null);
 			log.error("Révocation de l'offre de l'utilisateur '{}' arrivée à expiration", user.getId());
 			return;
@@ -176,7 +179,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setFiles(files);
 		//userRepo.save(user);
 
-		log.info("Saving '{}' in the database", user.getId());
+		log.info("Saving user '{}' in the database", user.getId());
 	}
 
 	private boolean checkUserOffer(User user) {
@@ -215,6 +218,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		// Offre expirée si date de fin de l'offre après la date d'aujourd'hui
 		if (expiration.getTime().after(new Date())) {
 			log.error("L'utilisateur '{}' n'a aucune commande non expirée liée à son offre", user.getId());
+			// Révocation de l'offre de l'utilisateur si offre expirée
+			//user.setOffer(null);
 			// Archivage de la commande comme pas archivée et offre expirée
 			or.setArchived(true);
 			orderRepo.save(or);
@@ -268,6 +273,36 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		//userRepo.save(user);
 
 		log.info("Set offer '{}' to user '{}'", offer.getId(), user.getId());
+	}
+
+//	@Override
+//	public void removeFileFromUser(User user, long fileId) throws Exception {
+//		Optional<File> optFile = fileRepo.findById(fileId);
+//		if (!optFile.isPresent()) {
+//			log.error("File '{}' not found in the database", fileId);
+//			throw new Exception("File not found in the database");
+//		}
+//
+//		File file = optFile.get();
+//		user.getFiles().remove(file);
+//
+//		log.info("File '{}' removed from files list of user '{}'", file.getId(), user.getId());
+//	}
+
+	@Override
+	public void archiveUserFile(User user, long fileId) throws Exception {
+		Optional<File> optFile = fileRepo.findById(fileId);
+		if (!optFile.isPresent()) {
+			log.error("File '{}' not found in the database", fileId);
+			throw new Exception("File not found in the database");
+		}
+
+		File file = optFile.get();
+//		for (File f : user.getFiles()) {
+//		}
+		file.setArchived(true);
+
+		log.info("File '{}' archived for user '{}'", file.getId(), user.getId());
 	}
 
 }

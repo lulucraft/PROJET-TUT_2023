@@ -1,0 +1,14 @@
+<div class="frame darkModeAuto">
+  <h3 mat-dialog-title>Ajouter un utilisateur</h3>
+  <div mat-dialog-content class="form-content">
+    <mat-form-field>
+      <mat-label>Nom d'utilisateur</mat-label>
+      <input matInput [(ngModel)]="username">
+    </mat-form-field>
+
+    <div class="form-footer">
+      <button mat-flat-button mat-dialog-close>Annuler</button>
+      <button mat-raised-button mat-dialog-close color="primary" type="submit" (click)="addUser()">Valider</button>
+    </div>
+  </div>
+</div>

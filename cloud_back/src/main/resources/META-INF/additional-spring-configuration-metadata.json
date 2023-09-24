@@ -1,5 +1,32 @@
-{"properties": [{
-  "name": "spring.http.multipart.max-file-size",
-  "type": "java.lang.String",
-  "description": "A description for 'spring.http.multipart.max-file-size'"
-}]}
+{"properties": [
+  {
+    "name": "spring.http.multipart.max-file-size",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.http.multipart.max-file-size'"
+  },
+  {
+    "name": "sftp.host",
+    "type": "java.lang.String",
+    "description": "A description for 'sftp.host'"
+  },
+  {
+    "name": "sftp.port",
+    "type": "java.lang.String",
+    "description": "A description for 'sftp.port'"
+  },
+  {
+    "name": "sftp.password",
+    "type": "java.lang.String",
+    "description": "A description for 'sftp.password'"
+  },
+  {
+    "name": "sftp.user",
+    "type": "java.lang.String",
+    "description": "A description for 'sftp.user'"
+  },
+  {
+    "name": "sftp.remote.directory",
+    "type": "java.lang.String",
+    "description": "A description for 'sftp.remote.directory'"
+  }
+]}

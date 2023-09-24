@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.nepta.cloud.model.File;
+import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.repository.FileRepo;
 import fr.nepta.cloud.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public Collection<File> getFiles() {
 		log.info("Fetching files from the database");
-		return fileRepo.findAll();
+		return fileRepo.findAllByArchived(false);
 	}
 
 	@Override
@@ -42,6 +43,11 @@ public class FileServiceImpl implements FileService {
 	public File getFile(String name) {
 		log.info("Fetching file '{}'", name);
 		return fileRepo.findByName(name);
+	}
+
+	@Override
+	public User getFileOwner(long fileId) {
+		return fileRepo.findFileOwner(fileId);
 	}
 
 }

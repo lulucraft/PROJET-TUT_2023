@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,13 +20,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import fr.nepta.cloud.model.File;
 import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
+import fr.nepta.cloud.model.Right;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.service.FileService;
 import fr.nepta.cloud.service.OfferService;
+import fr.nepta.cloud.service.RightService;
 import fr.nepta.cloud.service.RoleService;
 import fr.nepta.cloud.service.UserService;
 
+@IntegrationComponentScan// Pour scanner la gateway SFTP
 @SpringBootApplication
 @EnableJpaRepositories
 public class CloudApplication {
@@ -42,7 +46,7 @@ public class CloudApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(RoleService rs, UserService us, FileService ns, OfferService os) {
+	CommandLineRunner run(RoleService rs, UserService us, FileService ns, OfferService os, RightService rgts) {
 		return args -> {
 			// ROLES
 			if (rs.getRole("USER") == null) {
@@ -75,7 +79,7 @@ public class CloudApplication {
 			if (us.getUser("admin") == null) {
 				Offer offer = null;
 				List<Order> orders = null;
-				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>()));
+				us.saveUser(new User(null, null, null, "admin@gmail.com", "admin", "root", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>(), null));
 			}
 			if (!us.getUser("admin").getRoles().contains(rs.getRole("ADMIN"))) {
 				us.addRoleToUser("admin", "ADMIN");
@@ -84,18 +88,26 @@ public class CloudApplication {
 			if (us.getUser("user") == null) {
 				Offer offer = null;
 				List<Order> orders = null;
-				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>()));
+				us.saveUser(new User(null, null, null, "user@gmail.com", "user", "azerty", new Date(), true, true, offer, orders, new ArrayList<Role>(), new ArrayList<File>(), null));
 			}
 			if (!us.getUser("user").getRoles().contains(rs.getRole("USER"))) {
 				us.addRoleToUser("user", "USER");
 			}
 
-			// NEWSLETTER
+			// Create test files
 			if (ns.getFile("Fichier1") == null) {
-				ns.saveFile(new File(null, "Fichier1", new Date(), null, 0, "fezfezzef"));
+				ns.saveFile(new File(null, "Fichier1", new Date(), null, 0, "fezfezzef", false));
 			}
 			if (ns.getFile("Fichier2") == null) {
-				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg"));
+				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg", false));
+			}
+			
+			// Create test rights
+			if (rgts.getRight("Télécharger") == null) {
+				rgts.saveRight(new Right(null, "Télécharger"));
+			}
+			if (rgts.getRight("Supprimer") == null) {
+				rgts.saveRight(new Right(null, "Supprimer"));
 			}
 		};
 	}

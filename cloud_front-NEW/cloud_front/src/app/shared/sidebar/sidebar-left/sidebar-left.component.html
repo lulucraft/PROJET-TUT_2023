@@ -30,6 +30,14 @@
       </button>
     </li>
 
+    <!-- Fichiers -->
+    <li *ngIf="isAuthenticated() && hasOffer()">
+      <button mat-button (click)="users()">
+        <mat-icon>lock</mat-icon>
+        <span>Droits utilisateurs</span>
+      </button>
+    </li>
+
     <!-- Déconnexion -->
     <li *ngIf="isAuthenticated()">
       <button mat-button (click)="logout()">

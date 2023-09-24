@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Getter
-@Entity
+@Entity(name = "file")
 @Table(name = "file")
 public class File {
 
@@ -40,4 +40,7 @@ public class File {
 
 	@Column(name = "hash", nullable = false)
 	private String hash;
+
+	@Column(name = "archived", nullable = false, columnDefinition="tinyint(1) default 0")
+	private boolean archived;
 }
