@@ -84,4 +84,14 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 		return usrRepo.save(usr);
 	}
 
+	@Override
+	public boolean hasShareRights(User user) {
+		return this.getUserShareRightFromUser(user) != null;
+	}
+
+	@Override
+	public Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner) {
+		return null;
+	}
+
 }

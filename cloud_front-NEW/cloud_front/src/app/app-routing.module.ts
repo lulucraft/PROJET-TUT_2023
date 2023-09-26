@@ -40,7 +40,8 @@ const routes: Routes = [
       { path: '', component: HomeUserComponent },
       // { path: 'account', component: AccountComponent },
       { path: 'users', component: UsersComponent },
-      { path: 'files', component: FilesComponent }
+      { path: 'files', component: FilesComponent },
+      { path: 'shared_files', component: FilesComponent }
     ]
   },
 

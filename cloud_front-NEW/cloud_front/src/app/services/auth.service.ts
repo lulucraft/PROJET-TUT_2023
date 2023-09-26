@@ -61,11 +61,11 @@ export class AuthService {
         error: (error) => {
           if (error.error) {// && error.error.message) {
             // if (error.error.message === "Ce nom d'utilisateur est déjà utilisé") {
-            this.snackBar.open('Ce nom d\'utilisateur est déjà utilisé', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            this.snackBar.open('Ce nom d\'utilisateur est déjà utilisé', '', { duration: 7500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
             this.login(user);
             return;
             // } else {
-            //   this.snackBar.open(error.error.message, '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            //   this.snackBar.open(error.error.message, '', { duration: 1700, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
             // }
           }
           console.error(error);
@@ -229,6 +229,7 @@ export class AuthService {
     }
     user.accountActive = decodedToken.account_active;
     user.offer = decodedToken.offer;
+    user.shared = decodedToken.shared;
     console.log(user.offer);
 
     // User preferences

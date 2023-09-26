@@ -20,6 +20,7 @@ import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.model.UserShareRight;
 import fr.nepta.cloud.repository.FileRepo;
 import fr.nepta.cloud.repository.OrderRepo;
 import fr.nepta.cloud.repository.RoleRepo;
@@ -303,6 +304,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		file.setArchived(true);
 
 		log.info("File '{}' archived for user '{}'", file.getId(), user.getId());
+	}
+
+	@Override
+	public User getUserFromUserShareRight(UserShareRight usr) {
+		return this.userRepo.findByUserShareRightsId(usr.getId());
+	}
+
+	@Override
+	public Collection<User> getUsersSharer(User user) {
+		Collection<User> users = new ArrayList<>();
+		for (User u : this.userRepo.findUsersSharerByUserId(user.getId())) {
+			User use = new User();
+			use.setId(u.getId());
+			use.setEmail(u.getEmail());
+			users.add(use);
+		}
+		return users;
 	}
 
 }

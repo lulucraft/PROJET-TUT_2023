@@ -3,12 +3,43 @@
     <ol>
       <li><mat-icon>home</mat-icon>Accueil</li>
       <li><mat-icon>arrow_right</mat-icon></li>
-      <li><mat-icon>list</mat-icon>Fichiers</li>
+      <li *ngIf="!sharedMode"><mat-icon>list</mat-icon>Fichiers</li>
+      <li *ngIf="sharedMode"><mat-icon>list</mat-icon>Fichiers partagés</li>
     </ol>
   </nav>
 
   <div>
-    <h3>Vos fichiers</h3>
+    <h3 *ngIf="!sharedMode">Vos fichiers</h3>
+    <h3 *ngIf="sharedMode">Fichiers partagés</h3>
+
+    <div style="margin: 10px;">
+      <!-- display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: max-content;
+    flex-direction: row;
+    white-space: nowrap;
+    gap: 10px;
+    padding: 10px; -->
+      <form *ngIf="sharedMode">
+        <mat-form-field>
+          <mat-label>Partagé par</mat-label>
+          <mat-select [(value)]="selectedUserSharer" (selectionChange)="onSelectionChange($event)">
+            <!-- <mat-option>Partagé par</mat-option> -->
+            <mat-option *ngFor="let userSharer of usersSharer" [value]="userSharer.id">
+              {{ userSharer.email }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+      <!-- <button mat-raised-button class="select-button">
+      <select *ngIf="sharedMode" class="select">
+        <option>Partagé par</option>
+        <option *ngFor="let userSharer of usersSharer" [value]="userSharer.id">{{userSharer.username}}</option>
+      </select>
+    </button> -->
+    </div>
 
     <table mat-table [dataSource]="filesDataSource" class="table">
       <!-- Checkbox Column -->
@@ -24,11 +55,13 @@
             <mat-icon>more_horiz</mat-icon>
           </button>
           <mat-menu #actionsMenu="matMenu">
-            <button mat-menu-item (click)="downloadFiles(selection)">
-              <mat-icon color="primary" [matBadge]="selection.selected.length" matBadgeColor="primary" matBadgeSize="small">download</mat-icon>Télécharger
+            <button mat-menu-item (click)="downloadFiles(selection)" *ngIf="hasDownloadRight()">
+              <mat-icon color="primary" [matBadge]="selection.selected.length" matBadgeColor="primary"
+                matBadgeSize="small">download</mat-icon>Télécharger
             </button>
             <button mat-menu-item (click)="deleteFiles(selection)">
-              <mat-icon color="warn" [matBadge]="selection.selected.length" matBadgeColor="warn" matBadgeSize="small">delete</mat-icon>Supprimer
+              <mat-icon color="warn" [matBadge]="selection.selected.length" matBadgeColor="warn"
+                matBadgeSize="small">delete</mat-icon>Supprimer
             </button>
           </mat-menu>
         </th>
@@ -48,11 +81,15 @@
         <td mat-cell *matCellDef="let file">{{ file.name }}</td>
 
         <td mat-footer-cell *matFooterCellDef>
-          <input hidden type="file" (change)="addFile($event)" multiple="multiple" enctype='multipart/form-data' #fileInput>
-          <button mat-raised-button color="primary" (click)="fileInput.click()">
-            <mat-icon>add</mat-icon>Ajouter un fichier
-          </button>
-          <span *ngIf="fileInput.files && fileInput.files.length" style="margin-left: 10px;">{{ fileInput.files[0].name + (fileInput.files.length > 1 ? '...' : '') }}</span>
+          <ng-container *ngIf="!sharedMode || selectedUserSharer">
+            <input hidden type="file" (change)="addFile($event)" multiple="multiple" enctype='multipart/form-data'
+              #fileInput>
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
+              <mat-icon>add</mat-icon>Ajouter un fichier
+            </button>
+            <span *ngIf="fileInput.files && fileInput.files.length" style="margin-left: 10px;">{{
+              fileInput.files[0].name + (fileInput.files.length > 1 ? '...' : '') }}</span>
+          </ng-container>
         </td>
       </ng-container>
 
@@ -73,7 +110,7 @@
       <ng-container matColumnDef="btn_download" style="max-width: 65px;width: 65px;">
         <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
         <td mat-cell *matCellDef="let file">
-          <button mat-mini-fab color="primary" (click)="downloadFile(file)">
+          <button mat-mini-fab color="primary" (click)="downloadFile(file)" *ngIf="hasDownloadRight()">
             <mat-icon>download</mat-icon>
           </button>
         </td>

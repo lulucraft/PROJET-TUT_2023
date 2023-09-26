@@ -41,6 +41,10 @@ export class SidebarLeftComponent implements OnInit {
     return !!this.authService.currentUserValue?.offer;
   }
 
+  hasSharedFiles(): boolean {
+    return !!this.authService.currentUserValue?.shared;
+  }
+
   getUserName(): string {
     if (!this.authService.currentUserValue) {
       // Default to display
@@ -57,6 +61,11 @@ export class SidebarLeftComponent implements OnInit {
   files(): void {
     this.appHeader.leftMenuOpened = false;
     this.router.navigate(['/user/files']);
+  }
+
+  sharedFiles(): void {
+    this.appHeader.leftMenuOpened = false;
+    this.router.navigate(['/user/shared_files'], { state: { mode: 1 } });
   }
 
   users(): void {

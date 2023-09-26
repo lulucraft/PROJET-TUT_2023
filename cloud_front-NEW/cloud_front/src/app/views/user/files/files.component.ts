@@ -1,11 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Navigation, Router } from '@angular/router';
 import { File } from 'src/app/models/file';
-import { AuthService } from 'src/app/services/auth.service';
+import { User } from 'src/app/models/user';
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -23,11 +24,14 @@ export class FilesComponent implements OnInit, AfterViewInit {
   ];
   public filesDataSource: MatTableDataSource<File> = new MatTableDataSource<File>(this.filesCpt);
   public displayedColumns: string[] = ['select', 'label', 'credate', 'editdate', 'btn_download', 'btn_del'];
+  public sharedMode: boolean = false;
+  public usersSharer?: User[];
 
   // Unchanged files list (not filtered)
   private files?: File[];
 
   public selection = new SelectionModel<File>(true, []);
+  public selectedUserSharer?: User;
 
   // Files request table
   // public filesRequestsNotValidated: MatTableDataSource<File> = new MatTableDataSource<File>();
@@ -35,19 +39,26 @@ export class FilesComponent implements OnInit, AfterViewInit {
   // public filterNotValidated: string = 'all';
 
 
-  constructor(private dataService: DataService, private router: Router, private authService: AuthService, private snackBar: MatSnackBar) { }
+  constructor(private dataService: DataService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
+    if (this.route.routeConfig?.path === "shared_files") {//window.location.href.split('/').pop()
+      this.sharedMode = true;
+    }
   }
 
   ngAfterViewInit() {
-    // if (!this.isAdmin()) {
-    //   // USER
-    //   // this.filesRequestsNotValidated.paginator = this.paginator;
-    // }
-
-    // Load files after getting pagination reference (pagination must be loaded bedore the table dataSource)
-    this.loadFiles();
+    // let navig: Navigation | null = this.router.getCurrentNavigation();
+    // if (navig && navig.extras && navig.extras.state) {
+    // this.sharedMode = navig.extras.state["mode"] == 1 ? true : false;
+    if (this.sharedMode) {//window.location.href.split('/').pop()
+      // Load shared files after getting pagination reference (pagination must be loaded before the table dataSource)
+      // this.loadSharedFiles();
+      this.loadUserSharer();
+    } else {
+      // Load files after getting pagination reference (pagination must be loaded before the table dataSource)
+      this.loadFiles();
+    }
   }
 
   loadFiles(): void {
@@ -60,6 +71,26 @@ export class FilesComponent implements OnInit, AfterViewInit {
       this.filesDataSource.data = this.filesCpt;
     });
     // }
+  }
+
+  loadUserSharer(): void {
+    this.dataService.getUsersSharer().subscribe((usersSharer: User[]) => {
+      this.usersSharer = usersSharer;
+    });
+  }
+
+  loadSharedFiles(): void {
+    if (!this.selectedUserSharer || !this.selectedUserSharer.id) {
+      this.snackBar.open("Veuillez sélectionner un utilisateur partageur", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      return;
+    }
+
+    this.dataService.getSharedFiles(this.selectedUserSharer.id).subscribe((sharedFiles: File[]) => {
+      console.log(sharedFiles);
+      this.files = sharedFiles;
+      this.filesCpt = this.files;
+      this.filesDataSource.data = this.filesCpt;
+    });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -78,24 +109,22 @@ export class FilesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  isAdmin(): boolean {
-    return this.authService.isUserAdmin();
+  // isAdmin(): boolean {
+  //   return this.authService.isUserAdmin();
+  // }
+
+  hasDownloadRight(): boolean {
+    return !this.sharedMode;
   }
 
   deleteFile(file: File): void {
-    if (!file.id) {
-      // TODO: Error message
-      return;
-    }
-    let fileId: number = file.id;
-
-    this.dataService.deleteFile(fileId)
+    this.dataService.deleteFile(file)
       .subscribe({
         next: (resp: string) => {
           console.info(resp);
 
           // Remove file request from unfilter files list
-          this.files = this.files!.filter(c => c.id !== fileId);
+          this.files = this.files!.filter(c => c.id !== file.id);
           this.filesCpt = this.files;
           this.filesDataSource.data = this.filesCpt;
         },
@@ -108,20 +137,13 @@ export class FilesComponent implements OnInit, AfterViewInit {
 
   deleteFiles(files: SelectionModel<File>): void {
     for (let file of files.selected) {
-      if (!file.id) {
-        this.snackBar.open('Le fichier ' + file.name + ' est invalide', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
-        continue;
-      }
-
-      let fileId: number = file.id;
-
-      this.dataService.deleteFile(fileId)
+      this.dataService.deleteFile(file)
         .subscribe({
           next: (resp: string) => {
             console.info(resp);
 
             // Remove file request from unfilter files list
-            this.files = this.files!.filter(c => c.id !== fileId);
+            this.files = this.files!.filter(c => c.id !== file.id);
             this.filesCpt = this.files;
             this.filesDataSource.data = this.filesCpt;
           },
@@ -161,35 +183,24 @@ export class FilesComponent implements OnInit, AfterViewInit {
 
   downloadFiles(files: SelectionModel<File>): void {
     for (let file of files.selected) {
-      this.dataService.downloadFile(file);
+      this.dataService.downloadFile(file).subscribe();
     }
   }
 
   downloadFile(file: File): void {
-    this.dataService.downloadFile(file);
+    this.dataService.downloadFile(file).subscribe();
   }
 
-  // onSelectionChange(event: MatSelectChange): void {
-  //   if (!this.files) return;
+  onSelectionChange(event: MatSelectChange): void {
+    console.log(event.value)
+    console.log(this.usersSharer)
+    if (!this.files) return;
 
-  //   switch (event.value) {
-  //     case 'inprogress':
-  //       // this.filesRequestsNotValidated.data = this.files.filter();
-  //       break;
-
-  //     case 'validated':
-  //       // this.filesRequestsNotValidated.data = this.files.filter();
-  //       break;
-
-  //     case 'invalidated':
-  //       // this.filesRequestsNotValidated.data = this.files.filter();
-  //       break;
-
-  //     default:
-  //       // this.filesRequestsNotValidated.data = this.files;
-  //       break;
-  //   }
-  // }
+    switch (event.value) {
+      default:
+        break;
+    }
+  }
 
   showActions(selection: SelectionModel<File>) {
     console.log('selection', selection.selected);

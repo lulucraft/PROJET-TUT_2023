@@ -30,6 +30,14 @@
       </button>
     </li>
 
+    <!-- Fichiers partagés -->
+    <li *ngIf="isAuthenticated() && hasSharedFiles()">
+      <button mat-button (click)="sharedFiles()">
+        <mat-icon>work_off</mat-icon>
+        <span>Fichiers partagés</span>
+      </button>
+    </li>
+
     <!-- Fichiers -->
     <li *ngIf="isAuthenticated() && hasOffer()">
       <button mat-button (click)="users()">

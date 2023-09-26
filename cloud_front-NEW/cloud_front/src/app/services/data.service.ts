@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, lastValueFrom } from 'rxjs';
+import { Observable, catchError, lastValueFrom, map, throwError } from 'rxjs';
 import { User } from '../models/user';
 import { File } from '../models/file';
 import * as sha256 from "fast-sha256";
@@ -10,13 +10,14 @@ import { Country } from '../models/country';
 import { Order } from '../models/order';
 import { UserShareRight } from '../models/user-share-right';
 import { Right } from '../models/right';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  constructor(private http: HttpClient, @Inject('API_BASE_URL') private apiBaseUrl: string) { }
+  constructor(private http: HttpClient, @Inject('API_BASE_URL') private apiBaseUrl: string, private snackBar: MatSnackBar) { }
 
   // USER
   getNewUsers(): Observable<User[]> {
@@ -41,6 +42,12 @@ export class DataService {
   // File
   getFiles(): Observable<File[]> {
     return this.http.get<File[]>(this.apiBaseUrl + 'api/user/files');
+  }
+
+  getSharedFiles(userSharerId: number) {
+    return this.http.get<File[]>(this.apiBaseUrl + 'api/user/sharedfiles', {
+      params: { userSharerId: userSharerId }
+    });
   }
 
   async addFile(file: File, fileData: globalThis.File): Promise<number | undefined | null> {
@@ -81,15 +88,30 @@ export class DataService {
     return dbFile.id;
   }
 
-  downloadFile(file: File) {
+  downloadFile(file: File): Observable<any> {
     if (!file.id) {
-      alert("Erreur l'identification du fichier. Veuillez actualiser la page.");
-      return;
+      this.snackBar.open('Le fichier ' + file.name + ' est invalide', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      throw new Error("Fichier invalide");
     }
 
-    this.http.get(this.apiBaseUrl + 'api/user/file/download', { params: { file_id: file.id }, responseType: 'blob' }).subscribe((data: any) => {
-      this.downloadFileFromData(file.name, data);
-    });
+    return this.http.get(this.apiBaseUrl + 'api/user/file/download', { params: { file_id: file.id }, responseType: 'blob' }).pipe(map(
+      (data: any) => {
+        this.downloadFileFromData(file.name, data);
+      }),
+      catchError((err) => throwError(() => {
+        console.error(err);
+        this.snackBar.open('Erreur lors du téléchargement du fichier ' + file.name, '', { duration: 2500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      }))
+    );
+  }
+
+  deleteFile(file: File): Observable<any> {
+    if (!file.id) {
+      this.snackBar.open('Le fichier ' + file.name + ' est invalide', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      throw new Error("Fichier invalide");
+    }
+
+    return this.http.delete(this.apiBaseUrl + 'api/user/deletefile', { body: file.id });
   }
 
   // Rights
@@ -99,6 +121,10 @@ export class DataService {
 
   getUsersSharedRights(): Observable<UserShareRight[]> {
     return this.http.get<UserShareRight[]>(this.apiBaseUrl + 'api/user/userssharedrights');
+  }
+
+  getUsersSharer(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiBaseUrl + 'api/user/userssharer');
   }
 
   addUserShare(username: string): Observable<UserShareRight> {
@@ -121,13 +147,9 @@ export class DataService {
 
 
   // ADMIN
-  editFile(file: File): Observable<any> {
-    return this.http.post(this.apiBaseUrl + 'api/admin/editfile', file);
-  }
-
-  deleteFile(fileId: number): Observable<any> {
-    return this.http.delete(this.apiBaseUrl + 'api/user/deletefile', { body: fileId });
-  }
+  // editFile(file: File): Observable<any> {
+  //   return this.http.post(this.apiBaseUrl + 'api/admin/editfile', file);
+  // }
 
 
   getUsers(): Observable<User[]> {

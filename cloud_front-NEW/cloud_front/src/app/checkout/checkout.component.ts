@@ -264,11 +264,11 @@ export class CheckoutComponent implements OnInit {
             next: (token: JWTToken) => {
               this.authService.saveRefreshToken(token);
               console.log("User offer updated");
-              this.snackBar.open('Votre compte a été mis à jour', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+              this.snackBar.open('Votre compte a été mis à jour', '', { duration: 1700, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
             },
             error: () => {
               this.authService.logout();
-              this.snackBar.open('Veuillez vous reconnecter pour mettre à jour votre compte', '', { duration: 1500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+              this.snackBar.open('Veuillez vous reconnecter pour mettre à jour votre compte', '', { duration: 1700, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
             }
           });
         });

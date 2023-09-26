@@ -1,5 +1,6 @@
 package fr.nepta.cloud.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import fr.nepta.cloud.model.File;
@@ -7,6 +8,7 @@ import fr.nepta.cloud.model.Offer;
 import fr.nepta.cloud.model.Order;
 import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
+import fr.nepta.cloud.model.UserShareRight;
 
 public interface UserService {
 
@@ -35,6 +37,10 @@ public interface UserService {
 	void setOffer(User user, Offer offer);
 
 	void archiveUserFile(User user, long fileId) throws Exception;
+
+	User getUserFromUserShareRight(UserShareRight usr);
+
+	Collection<User> getUsersSharer(User user);
 
 //	void removeFileFromUser(User user, long fileId) throws Exception;
 

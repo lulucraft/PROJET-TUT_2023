@@ -34,6 +34,7 @@ import fr.nepta.cloud.model.Role;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.service.MailService;
 import fr.nepta.cloud.service.UserService;
+import fr.nepta.cloud.service.UserShareRightService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ import lombok.extern.log4j.Log4j2;
 public class AuthController {
 
 	private final UserService us;
+	private final UserShareRightService usrs;
 
 	@Autowired
 	private final MailService mailS;
@@ -74,6 +76,7 @@ public class AuthController {
 						.withClaim("dark_mode_enabled", user.isDarkModeEnabled())
 						.withClaim("account_active", user.isAccountActive())
 						.withClaim("offer", user.getOffer() != null ? user.getOffer().getName() : null)
+						.withClaim("shared", usrs.hasShareRights(user))
 						.sign(algo);
 
 				refreshToken = JWT.create()

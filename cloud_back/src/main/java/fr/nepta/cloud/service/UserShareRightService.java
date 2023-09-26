@@ -24,4 +24,8 @@ public interface UserShareRightService {
 	Collection<UserShareRight> getUserShareRightFromUser(User user);
 
 	UserShareRight getUserShareRightFromUserFileOwner(User user, User fileOwner);
+
+	boolean hasShareRights(User user);
+
+	Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner);
 }

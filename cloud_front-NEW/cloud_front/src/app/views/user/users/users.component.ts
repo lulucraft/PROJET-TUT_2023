@@ -27,7 +27,7 @@ export class UsersComponent {
   constructor(private dataService: DataService, private dialog: MatDialog, private snackBar: MatSnackBar) { }
 
   ngAfterViewInit() {
-    // Load rights/users after getting pagination reference (pagination must be loaded bedore the table dataSource)
+    // Load rights/users after getting pagination reference (pagination must be loaded before the table dataSource)
     this.loadRights();
     this.loadUsers();
   }

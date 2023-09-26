@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.nepta.cloud.CloudApplication;
 import fr.nepta.cloud.service.MailService;
 import fr.nepta.cloud.service.UserService;
+import fr.nepta.cloud.service.UserShareRightService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,11 +38,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	private AuthenticationManager authenticationManager;
 	private final UserService us;
+	private final UserShareRightService usrs;
 	private final MailService mailS;
 
 	public AuthenticationFilter(AuthenticationManager am, ApplicationContext ctx) {
 		this.authenticationManager = am;
 		this.us = ctx.getBean(UserService.class);
+		this.usrs = ctx.getBean(UserShareRightService.class);
 		this.mailS = ctx.getBean(MailService.class);
 	}
 
@@ -100,6 +103,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 				.withClaim("dark_mode_enabled", user.isDarkModeEnabled())
 				.withClaim("account_active", user.isAccountActive())
 				.withClaim("offer", user.getOffer() != null ? user.getOffer().getName() : null)
+				.withClaim("shared", usrs.hasShareRights(user))
 				.sign(algo);
 
 		String refreshToken = JWT.create()

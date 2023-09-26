@@ -19,4 +19,5 @@ export interface User {
   darkModeEnabled?: boolean | true;
   accountActive?: boolean;
   offer?: string;
+  shared?: boolean | false;
 }

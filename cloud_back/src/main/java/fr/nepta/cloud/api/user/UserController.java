@@ -1,15 +1,13 @@
 package fr.nepta.cloud.api.user;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -78,6 +76,31 @@ public class UserController {
 		return us.getUser(auth.getName()).getFiles().stream().filter(f -> f.isArchived() == false).toList();
 	}
 
+	@RolesAllowed({"USER"})
+	@GetMapping(value = "sharedfiles")
+	public Collection<File> getSharedFiles(@RequestParam(name = "user_sharer_id") long userSharerId) throws Exception {//@RequestParam String username
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		User user = us.getUser(auth.getName());
+		User userOwner = us.getUser(userSharerId);
+		// Get all shared
+//		Collection<UserShareRight> usrS = usrs.getUserShareRightFromUserAndUserOwner(user, userOwner);
+
+		Collection<File> files = new ArrayList<>();
+//		for (UserShareRight usr : usrS) {
+//			User userOwner = us.getUserFromUserShareRight(usr);
+		Collection<File> userOwnerFiles = userOwner.getFiles().stream().filter(f -> f.isArchived() == false).toList();
+		if (userOwnerFiles != null && userOwnerFiles.size() > 0) {
+			// Add all files of user who has shared files
+			files.addAll(userOwnerFiles);
+			System.err.println(userOwnerFiles.size());
+		} else {
+			log.error("Error: no files found for user '{}'", userOwner.getId());
+		}
+//		}
+
+		return files;
+	}
+
 	@RolesAllowed({"USER","ADMIN"})
 	@PutMapping(value = "file")
 	public File addFile(@RequestBody File file) {//@RequestBody File file
@@ -136,27 +159,34 @@ public class UserController {
 
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "file/download")
-	public byte[] downloadFile(@RequestParam(name = "file_id") long fileId) throws IOException {
+	public byte[] downloadFile(@RequestParam(name = "file_id") long fileId) throws IllegalAccessException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User user = us.getUser(auth.getName());
 		User fileOwner = fs.getFileOwner(fileId);
-		InputStream inputStream = null;
+		boolean hasRight = false;
 
 		if (fileOwner == user) {
-			inputStream = sftpUploadGateway.downloadFile(fileId);			
+			hasRight = true;
 		}
 
-		if (inputStream == null) {
-			Right downloadRight = rgts.getRight("Télécharger");
-			UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
-			// If user is in the shared user && If user has download right
-			if (fileOwner.getUserShareRights().contains(usr) && usr.getRights().contains(downloadRight)) {
-				//user.getFiles().contains(fs.getFile(file.getId()))
-				inputStream = sftpUploadGateway.downloadFile(fileId);
+		Right downloadRight = rgts.getRight("Télécharger");
+		UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
+		// If user is in the shared user && If user has download right
+		if (fileOwner.getUserShareRights().contains(usr) && usr.getRights().contains(downloadRight)) {
+			//user.getFiles().contains(fs.getFile(file.getId()))
+			hasRight = true;
+		}
+
+		if (hasRight) {
+			try {
+				return IOUtils.toByteArray(sftpUploadGateway.downloadFile(fileId));
+			} catch (IOException e) {
+				//e.printStackTrace();
+				throw new IllegalAccessException(e.getMessage());
 			}
 		}
 
-		return IOUtils.toByteArray(inputStream);
+		return null;
 	}
 
 	@RolesAllowed({"USER","ADMIN"})
@@ -195,6 +225,14 @@ public class UserController {
 	@GetMapping(value = "userssharedrights")
 	public Collection<UserShareRight> getUsersSharedRights() {
 		return usrs.getUsersSharedRights();
+	}
+	
+	@RolesAllowed({"USER"})
+	@GetMapping(value = "userssharer")
+	public Collection<User> getUsersSharer() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		return us.getUsersSharer(user);
 	}
 
 	@RolesAllowed({"USER","ADMIN"})
