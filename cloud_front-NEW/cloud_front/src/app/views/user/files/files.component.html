@@ -27,7 +27,7 @@
           <mat-label>Partagé par</mat-label>
           <mat-select [(value)]="selectedUserSharer" (selectionChange)="onSelectionChange($event)">
             <!-- <mat-option>Partagé par</mat-option> -->
-            <mat-option *ngFor="let userSharer of usersSharer" [value]="userSharer.id">
+            <mat-option *ngFor="let userSharer of usersSharer" [value]="userSharer">
               {{ userSharer.email }}
             </mat-option>
           </mat-select>
@@ -47,7 +47,7 @@
         <th mat-header-cell *matHeaderCellDef style="width: 120px;">
           <!-- Checkbox de selection de toutes les ligne -->
           <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()">
+            [indeterminate]="selection.hasValue() && !isAllSelected()" *ngIf="hasRight()">
           </mat-checkbox>
           <!-- Bouton 3 points affichage actions -->
           <button mat-icon-button *ngIf="selection.hasValue()" (click)="showActions(selection)"
@@ -59,7 +59,7 @@
               <mat-icon color="primary" [matBadge]="selection.selected.length" matBadgeColor="primary"
                 matBadgeSize="small">download</mat-icon>Télécharger
             </button>
-            <button mat-menu-item (click)="deleteFiles(selection)">
+            <button mat-menu-item (click)="deleteFiles(selection)" *ngIf="hasDeleteRight()">
               <mat-icon color="warn" [matBadge]="selection.selected.length" matBadgeColor="warn"
                 matBadgeSize="small">delete</mat-icon>Supprimer
             </button>
@@ -68,7 +68,7 @@
         <td mat-cell *matCellDef="let row">
           <!-- Checkbox de selection de la ligne -->
           <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)">
+            [checked]="selection.isSelected(row)" *ngIf="hasRight()">
           </mat-checkbox>
         </td>
         <!-- Empty footer column -->
@@ -84,7 +84,7 @@
           <ng-container *ngIf="!sharedMode || selectedUserSharer">
             <input hidden type="file" (change)="addFile($event)" multiple="multiple" enctype='multipart/form-data'
               #fileInput>
-            <button mat-raised-button color="primary" (click)="fileInput.click()">
+            <button mat-raised-button color="primary" (click)="fileInput.click()" *ngIf="hasAddFileRight()">
               <mat-icon>add</mat-icon>Ajouter un fichier
             </button>
             <span *ngIf="fileInput.files && fileInput.files.length" style="margin-left: 10px;">{{
@@ -120,7 +120,7 @@
       <ng-container matColumnDef="btn_del" style="max-width: 65px;width: 65px;">
         <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
         <td mat-cell *matCellDef="let file">
-          <button mat-mini-fab color="warn" (click)="deleteFile(file)">
+          <button mat-mini-fab color="warn" (click)="deleteFile(file)" *ngIf="hasDeleteRight()">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
@@ -143,35 +143,6 @@
   </div>
 
   <!-- <mat-divider style="margin: 15px 0;"></mat-divider> -->
-
-  <!-- USER table -->
-  <!-- <div style="position: relative;" *ngIf="!isAdmin()">
-
-    <mat-table [dataSource]="filesRequestsNotValidated" class="table">
-
-      <!-- Date création -->
-  <!--    <ng-container matColumnDef="creationDate">
-        <mat-header-cell *matHeaderCellDef>Date création</mat-header-cell>
-        <mat-cell *matCellDef="let file">{{ file.creationDate | date:'dd/MM/YYYY HH:mm:ss' }}</mat-cell>
-      </ng-container>
-
-      <!-- Bouton suppression ligne -->
-  <!--    <ng-container matColumnDef="btn_del">
-        <mat-header-cell *matHeaderCellDef style="max-width: 65px;width: 65px;"></mat-header-cell>
-        <mat-cell *matCellDef="let file" style="max-width: 65px;width: 65px;">
-          <!-- Line id -->
-  <!-- <span style="display: none;" #fileId>{{ file.id }}</span> -->
-  <!-- Delete line button -->
-  <!--        <button mat-mini-fab color="warn" (click)="deleteFile(file.id)"
-            *ngIf="!file.validated && !file.validator">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </mat-cell>
-      </ng-container>
-
-      <mat-header-row *matHeaderRowDef="columnsFilesRequestsNotValidated"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: columnsFilesRequestsNotValidated"></mat-row>
-    </mat-table>
 
     <!-- No row label -->
   <!--  <div style="margin-top: 10px;" *ngIf="!filesRequestsNotValidated.data.length">

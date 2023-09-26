@@ -221,6 +221,21 @@ public class UserController {
 		return rgts.getRights();
 	}
 
+	@RolesAllowed({"USER"})
+	@GetMapping(value = "hasright")
+	public boolean hasRight(@RequestParam(name = "user_sharer_id") long userSharerId, @RequestParam(name = "right_name") String rightName) throws Exception {
+		Right right = rgts.getRight(rightName);
+		if (right == null) return false;
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		User userSharer = us.getUser(userSharerId);
+		if (userSharer == null) return false;
+
+		UserShareRight userShareRight = usrs.getUserShareRightFromUserFileOwner(user, userSharer);
+		return userShareRight != null && userShareRight.getRights().contains(right);
+	}
+
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "userssharedrights")
 	public Collection<UserShareRight> getUsersSharedRights() {
@@ -247,6 +262,13 @@ public class UserController {
 		Right right = rgts.getRight(rightId);
 		if (right == null) {
 			log.error("Right '{}' not found in the database", rightId);
+			return null;
+		}
+
+		if (right.getName().equalsIgnoreCase("Afficher")) {
+			// On supprime dans tous les puisque si appel de cette méthode, c'est qu'on souhaite désactiver la perm comme le droit "Afficher" est activé par défaut
+			us.getUserFromUserShareRight(userShareRight).getUserShareRights().remove(userShareRight);
+			usrs.deleteUserShareRight(userShareRight);
 			return null;
 		}
 

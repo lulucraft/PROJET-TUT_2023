@@ -46,7 +46,7 @@ export class DataService {
 
   getSharedFiles(userSharerId: number) {
     return this.http.get<File[]>(this.apiBaseUrl + 'api/user/sharedfiles', {
-      params: { userSharerId: userSharerId }
+      params: { user_sharer_id: userSharerId }
     });
   }
 
@@ -129,6 +129,10 @@ export class DataService {
 
   addUserShare(username: string): Observable<UserShareRight> {
     return this.http.post<UserShareRight>(this.apiBaseUrl + 'api/user/usershare', username);
+  }
+
+  hasUserSharerRight(userSharerId: number, right: string): Observable<boolean> {
+    return this.http.get<boolean>(this.apiBaseUrl + 'api/user/hasright', { params: { user_sharer_id: userSharerId, right_name: right }});
   }
 
   enableRight(userShareRight: UserShareRight, right: Right, enable: boolean): Observable<UserShareRight> {

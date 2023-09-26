@@ -103,11 +103,17 @@ public class CloudApplication {
 			}
 			
 			// Create test rights
+			if (rgts.getRight("Afficher") == null) {
+				rgts.saveRight(new Right(null, "Afficher"));
+			}
 			if (rgts.getRight("Télécharger") == null) {
 				rgts.saveRight(new Right(null, "Télécharger"));
 			}
 			if (rgts.getRight("Supprimer") == null) {
 				rgts.saveRight(new Right(null, "Supprimer"));
+			}
+			if (rgts.getRight("Ajouter") == null) {
+				rgts.saveRight(new Right(null, "Ajouter"));
 			}
 		};
 	}

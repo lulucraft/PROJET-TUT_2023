@@ -21,11 +21,13 @@ public interface UserShareRightService {
 
 	UserShareRight removeRightToUserShareRight(UserShareRight usr, Right right);
 
-	Collection<UserShareRight> getUserShareRightFromUser(User user);
+	Collection<UserShareRight> getUserShareRightsFromUser(User user);
 
 	UserShareRight getUserShareRightFromUserFileOwner(User user, User fileOwner);
 
 	boolean hasShareRights(User user);
 
-	Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner);
+	void deleteUserShareRight(UserShareRight userShareRight);
+
+//	Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner);
 }

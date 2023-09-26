@@ -29,6 +29,9 @@ export class FilesComponent implements OnInit, AfterViewInit {
 
   // Unchanged files list (not filtered)
   private files?: File[];
+  private sharedDownloadRight: boolean = false;
+  private sharedDeleteRight: boolean = false;
+  private sharedAddFileRight: boolean = false;
 
   public selection = new SelectionModel<File>(true, []);
   public selectedUserSharer?: User;
@@ -54,7 +57,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
     if (this.sharedMode) {//window.location.href.split('/').pop()
       // Load shared files after getting pagination reference (pagination must be loaded before the table dataSource)
       // this.loadSharedFiles();
-      this.loadUserSharer();
+      this.loadUsersSharer();
     } else {
       // Load files after getting pagination reference (pagination must be loaded before the table dataSource)
       this.loadFiles();
@@ -73,9 +76,14 @@ export class FilesComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  loadUserSharer(): void {
+  loadUsersSharer(): void {
     this.dataService.getUsersSharer().subscribe((usersSharer: User[]) => {
       this.usersSharer = usersSharer;
+      if (usersSharer.length == 1) {
+        // Init the first sharer as default
+        this.selectedUserSharer = this.usersSharer.at(0);
+        this.loadSharedFiles();
+      }
     });
   }
 
@@ -84,6 +92,13 @@ export class FilesComponent implements OnInit, AfterViewInit {
       this.snackBar.open("Veuillez sélectionner un utilisateur partageur", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
       return;
     }
+
+    // if (this.selectedUserSharer && this.selectedUserSharer.id) {
+    this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Télécharger").subscribe((hasDownloadRight: boolean) => this.sharedDownloadRight = hasDownloadRight);
+    this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Supprimer").subscribe((hasDeleteRight: boolean) => this.sharedDeleteRight = hasDeleteRight);
+    // } else {
+    //   console.info("Pas d'utilisateur partageur sélectionné ou l'utilisateur partageur n'a pas d'id")
+    // }
 
     this.dataService.getSharedFiles(this.selectedUserSharer.id).subscribe((sharedFiles: File[]) => {
       console.log(sharedFiles);
@@ -114,7 +129,19 @@ export class FilesComponent implements OnInit, AfterViewInit {
   // }
 
   hasDownloadRight(): boolean {
-    return !this.sharedMode;
+    return !this.sharedMode || this.sharedDownloadRight;
+  }
+
+  hasDeleteRight(): boolean {
+    return !this.sharedMode || this.sharedDeleteRight;
+  }
+
+  hasAddFileRight(): boolean {
+    return !this.sharedMode || this.sharedAddFileRight;
+  }
+
+  hasRight(): boolean {
+    return !this.sharedMode || this.hasDownloadRight() || this.hasDeleteRight() || this.hasAddFileRight();
   }
 
   deleteFile(file: File): void {
@@ -188,18 +215,21 @@ export class FilesComponent implements OnInit, AfterViewInit {
   }
 
   downloadFile(file: File): void {
+    this.snackBar.open("Téléchargement du fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
     this.dataService.downloadFile(file).subscribe();
   }
 
   onSelectionChange(event: MatSelectChange): void {
     console.log(event.value)
     console.log(this.usersSharer)
-    if (!this.files) return;
+    console.log(this.selectedUserSharer)
 
-    switch (event.value) {
-      default:
-        break;
-    }
+    this.loadSharedFiles();
+
+    // this.dataService.getSharedFiles(event.value).subscribe((sharedFiles: File[]) => {
+    //   this.files = sharedFiles;
+    //   console.log(sharedFiles)
+    // });
   }
 
   showActions(selection: SelectionModel<File>) {

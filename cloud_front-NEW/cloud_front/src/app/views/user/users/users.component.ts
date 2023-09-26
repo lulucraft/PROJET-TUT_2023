@@ -58,8 +58,9 @@ export class UsersComponent {
     const matDialogRef = this.dialog.open(EnterUserComponent, {
       // data: { username: 'test' },
     });
-    matDialogRef.beforeClosed().subscribe(result => {
+    matDialogRef.afterClosed().subscribe(result => {
       console.log(result)
+      window.location.reload();
     })
   }
 
@@ -82,8 +83,12 @@ export class UsersComponent {
     console.log(enable)
     let right = this.findRight(rightName);
     if (!right) {
-      this.snackBar.open("Erreur interne. Impossible de trouver", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      this.snackBar.open("Erreur interne. Impossible de trouver le droit", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
       return;
+    }
+
+    if (rightName === 'Afficher') {
+      window.location.reload();
     }
 
     this.dataService.enableRight(userShareRight, right, enable).subscribe((d: any) => {
