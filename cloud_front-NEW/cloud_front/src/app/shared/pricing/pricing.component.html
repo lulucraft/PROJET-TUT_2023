@@ -25,7 +25,10 @@
         <mat-divider></mat-divider>
 
         <div class="pricing-block-footer text-center">
-          <button mat-stroked-button (click)="choiceOffer(offer.id)">Choisir cette offre</button>
+          <div style="display: flex; gap: 5px; align-items: center;">
+            <input matInput type="number" class="text-center" value="1" #offerQtyInput><small>mois</small>
+          </div>
+          <button mat-stroked-button (click)="choiceOffer(offer.id, offerQtyInput.value)">Choisir cette offre</button>
         </div>
       </div>
 

@@ -101,7 +101,7 @@ public class CloudApplication {
 			if (ns.getFile("Fichier2") == null) {
 				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg", false));
 			}
-			
+
 			// Create test rights
 			if (rgts.getRight("Afficher") == null) {
 				rgts.saveRight(new Right(null, "Afficher"));

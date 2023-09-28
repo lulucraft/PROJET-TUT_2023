@@ -28,7 +28,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
   public usersSharer?: User[];
 
   // Unchanged files list (not filtered)
-  private files?: File[];
+  private files: File[] = [];
   private sharedDownloadRight: boolean = false;
   private sharedDeleteRight: boolean = false;
   private sharedAddFileRight: boolean = false;
@@ -96,6 +96,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
     // if (this.selectedUserSharer && this.selectedUserSharer.id) {
     this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Télécharger").subscribe((hasDownloadRight: boolean) => this.sharedDownloadRight = hasDownloadRight);
     this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Supprimer").subscribe((hasDeleteRight: boolean) => this.sharedDeleteRight = hasDeleteRight);
+    this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Ajouter").subscribe((hasAddFileRight: boolean) => this.sharedAddFileRight = hasAddFileRight);
     // } else {
     //   console.info("Pas d'utilisateur partageur sélectionné ou l'utilisateur partageur n'a pas d'id")
     // }
@@ -140,15 +141,18 @@ export class FilesComponent implements OnInit, AfterViewInit {
     return !this.sharedMode || this.sharedAddFileRight;
   }
 
-  hasRight(): boolean {
-    return !this.sharedMode || this.hasDownloadRight() || this.hasDeleteRight() || this.hasAddFileRight();
+  isSelectionVisible(): boolean {
+    return !this.sharedMode || this.hasDownloadRight() || this.hasDeleteRight();
   }
 
   deleteFile(file: File): void {
+    this.snackBar.open("Suppression du fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
+
     this.dataService.deleteFile(file)
       .subscribe({
         next: (resp: string) => {
           console.info(resp);
+          this.snackBar.open("Fichier supprimé", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
 
           // Remove file request from unfilter files list
           this.files = this.files!.filter(c => c.id !== file.id);
@@ -157,17 +161,20 @@ export class FilesComponent implements OnInit, AfterViewInit {
         },
         error: (err: any) => {
           console.error(err);
-          alert("Erreur lors de la suppression du fichier");
+          this.snackBar.open("Erreur lors de la suppression du fichier", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
         }
       });
   }
 
   deleteFiles(files: SelectionModel<File>): void {
+    this.snackBar.open("Suppression des fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
+
     for (let file of files.selected) {
       this.dataService.deleteFile(file)
         .subscribe({
           next: (resp: string) => {
             console.info(resp);
+            this.snackBar.open("Fichier supprimé", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
 
             // Remove file request from unfilter files list
             this.files = this.files!.filter(c => c.id !== file.id);
@@ -176,7 +183,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
           },
           error: (err: any) => {
             console.error(err);
-            alert("Erreur lors de la suppression du fichier");
+            this.snackBar.open("Erreur lors de la suppression du fichier", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
           }
         });
     }
@@ -186,29 +193,68 @@ export class FilesComponent implements OnInit, AfterViewInit {
     if (!event.target || !event.target.files) return;
     let files: FileList = event.target.files;
 
+    this.snackBar.open("Ajout du fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
+
     for (let i = 0; i < files.length; i++) {
-      let file: globalThis.File = files[i];
-      console.info(file)
+      let fileData: globalThis.File = files[i];
+      console.info(fileData)
 
       let creationDate: Date = new Date();
-      this.dataService.addFile({ name: file.name, creationDate: creationDate, size: file.size }, file).then(fileId => {
-        if (fileId === undefined) {
-          // file.id === undefined après requête 'api/user/file'
-          console.error("Erreur lors de l'enregistrement du fichier dans la base de données");
-          return;
-        } else if (!fileId) {
-          console.error("Erreur lors de la tentative de l'enregistrement du fichier en base");
+      let file: File = { name: fileData.name, creationDate: creationDate, size: fileData.size };
+
+      if (this.sharedMode) {
+        // Page fichiers partagés
+        if (!this.selectedUserSharer || !this.selectedUserSharer.id) {
+          alert("Erreur : partageur invalide")
           return;
         }
-        console.info(fileId);
 
-        // Ajout du fichier dans le table
-        this.files?.push({ id: fileId, name: file.name, creationDate: creationDate, size: file.size })
-      });
+        this.dataService.addSharedFile(file, fileData, this.selectedUserSharer!.id).then(fileId => {
+          if (fileId === undefined) {
+            // file.id === undefined après requête 'api/user/file'
+            this.snackBar.open("Erreur lors de l'enregistrement du fichier dans la base de données", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            return;
+          } else if (!fileId) {
+            this.snackBar.open("Erreur lors de la tentative de l'enregistrement du fichier en base", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            return;
+          }
+          console.info(fileId);
+          this.snackBar.open("Fichier ajouté", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+
+          // On défini l'id avant d'ajouter le fichier dans la liste du table
+          file.id = fileId;
+          // Ajout du fichier dans le table
+          this.files.push(file)
+          this.filesCpt = this.files;
+          this.filesDataSource.data = this.filesCpt;
+        });
+      }
+      else {
+        // Page fichiers
+        this.dataService.addFile(file, fileData).then(fileId => {
+          if (fileId === undefined) {
+            // file.id === undefined après requête 'api/user/file'
+            this.snackBar.open("Erreur lors de l'enregistrement du fichier dans la base de données", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            return;
+          } else if (!fileId) {
+            this.snackBar.open("Erreur lors de la tentative de l'enregistrement du fichier en base", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+            return;
+          }
+          console.info(fileId);
+
+          // On défini l'id avant d'ajouter le fichier dans la liste du table
+          file.id = fileId;
+          // Ajout du fichier dans le table
+          this.files.push(file)
+          this.filesCpt = this.files;
+          this.filesDataSource.data = this.filesCpt;
+        });
+      }
     }
   }
 
   downloadFiles(files: SelectionModel<File>): void {
+    this.snackBar.open("Téléchargement des fichiers en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
     for (let file of files.selected) {
       this.dataService.downloadFile(file).subscribe();
     }

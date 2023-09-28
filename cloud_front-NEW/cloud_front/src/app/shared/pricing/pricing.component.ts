@@ -23,8 +23,8 @@ export class PricingComponent {
     // });
   }
 
-  choiceOffer(offer: number): void {
-    this.router.navigate(['/checkout', offer]);
+  choiceOffer(offer: number, qty: string): void {
+    this.router.navigate(['/checkout', offer], { state: { qty: qty }});
     // if (offer === 1) {
     // } else if (offer === 2) {
     // }

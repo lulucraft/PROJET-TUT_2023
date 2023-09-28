@@ -17,12 +17,12 @@ export class EnterUserComponent {
 
   addUser(): void {
     if (!this.username) {
-      this.snackBar.open("Veuillez entrer un nom d'utilisateur", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      this.snackBar.open("Veuillez entrer un nom d'utilisateur", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
       return;
     }
 
     if (this.username === this.authService.currentUserValue?.username) {
-      this.snackBar.open("Vous ne pouvez pas partager à vous-même", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      this.snackBar.open("Vous ne pouvez pas partager à vous-même", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
       return;
     }
 

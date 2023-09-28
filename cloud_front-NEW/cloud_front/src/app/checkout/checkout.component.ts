@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Navigation, Params, Router } from '@angular/router';
 import { ICancelCallbackData, ICreateOrderRequest, IOnApproveCallbackActions, IOnApproveCallbackData, IPayPalConfig } from 'ngx-paypal';
 import { Country } from '../models/country';
 import { Offer } from '../models/offer';
 import { AuthService } from '../services/auth.service';
 import { DataService, countries } from '../services/data.service';
 import { MatStepper } from '@angular/material/stepper';
-import { Observable } from 'rxjs/internal/Observable';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { JWTToken } from '../models/jwt-token';
 
@@ -34,6 +33,8 @@ export class CheckoutComponent implements OnInit {
 
   public payPalConfig?: IPayPalConfig;
 
+  public quantity: number = 1;
+
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
@@ -41,7 +42,13 @@ export class CheckoutComponent implements OnInit {
     private dataService: DataService,
     private authService: AuthService,
     private snackBar: MatSnackBar
-  ) { }
+  ) {
+    let navig: Navigation | null = this.router.getCurrentNavigation();
+    if (navig && navig.extras && navig.extras.state) {
+      this.quantity = navig.extras.state['qty'];
+      console.log(this.quantity)
+    }
+  }
 
   ngOnInit(): void {
     if (this.authService.currentUserValue?.offer) {
@@ -113,6 +120,10 @@ export class CheckoutComponent implements OnInit {
     });
 
   }
+
+  // toInt(input: string) {
+  //   return parseInt(input);
+  // }
 
   // async ngAfterViewInit() {
   //   this.route.params.subscribe((params: Params) => {
@@ -186,6 +197,7 @@ export class CheckoutComponent implements OnInit {
     }
 
     let offer = this.offer!;
+    let totalPrice = offer.price * this.quantity;
 
     this.payPalConfig = {
       currency: 'EUR',
@@ -194,18 +206,18 @@ export class CheckoutComponent implements OnInit {
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
-            value: offer.price.toString(),
+            value: totalPrice.toString(),
             currency_code: "EUR",
             breakdown: {
               item_total: {
-                value: offer.price.toString(),
+                value: totalPrice.toString(),
                 currency_code: "EUR"
               }
             }
           },
           items: [{
             name: offer.name,
-            quantity: '1',
+            quantity: this.quantity.toString(),
             unit_amount: {
               currency_code: "EUR",
               value: offer.price.toString()
@@ -256,7 +268,8 @@ export class CheckoutComponent implements OnInit {
 
         this.dataService.sendOrder({
           paypalId: order.id,
-          date: new Date()
+          date: new Date(),
+          quantity: this.quantity
           // products: paypalProducts
         }).subscribe(() => {
           // Refresh token to set new offer in user token

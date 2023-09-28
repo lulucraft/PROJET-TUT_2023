@@ -58,7 +58,9 @@
       <ngx-paypal [config]="payPalConfig" id="paypal-container"></ngx-paypal>
 
       <div class="text-center">
-        <p>Total à payer : <b>{{ offer!.price }} €</b></p>
+        <p>Quantité : <b>{{ quantity }}</b></p>
+        <p>Prix unitaire : <b>{{ offer!.price }} €</b></p>
+        <p>Total à payer : <b>{{ offer!.price * quantity }} €</b></p>
       </div>
 
       <div class="form-item-group">

@@ -2,6 +2,7 @@ package fr.nepta.cloud.service.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,16 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 		return usrRepo.save(usr);//User user, R
 	}
 
-	@Override
-	public Collection<UserShareRight> getUsersSharedRights() {
-		log.info("Fetching all user_share_right");
-		return usrRepo.findAll();
-	}
+//	@Override
+//	public Collection<UserShareRight> getUsersSharedRights() {
+//		log.info("Fetching all user_share_right");
+//		return usrRepo.findAll();
+//	}
 
 	@Override
-	public UserShareRight getUserShareRight(long id) {
+	public Optional<UserShareRight> getUserShareRight(long id) {
 		log.info("Fetching user_share_right '{}'", id);
-		return usrRepo.findById(id).get();
+		return usrRepo.findById(id);
 	}
 
 	@Override
@@ -110,6 +111,11 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 	public void deleteUserShareRight(UserShareRight userShareRight) {
 		log.info("Deleting rights of user '{}'", userShareRight.getUser().getId());
 		usrRepo.delete(userShareRight);
+	}
+
+	@Override
+	public Collection<UserShareRight> getUserShareRightsFromUserSharer(User user) {
+		return usrRepo.findByUserSharerId(user.getId());
 	}
 
 //	@Override

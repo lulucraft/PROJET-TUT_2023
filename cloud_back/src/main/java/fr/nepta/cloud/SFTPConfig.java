@@ -99,7 +99,7 @@ public class SFTPConfig {
 
 	@ServiceActivator(inputChannel = "toUploadChannel")
 	public void uploadFile(UploadFileData uploadFileData) throws IOException {
-		System.err.println(uploadFileData.mpFile.getName());
+		System.err.println("Upload " + uploadFileData.fileName);
 
 //		StringBuilder textBuilder = new StringBuilder();
 		sftpSessionFactory().getSession().write(uploadFileData.mpFile.getInputStream(), uploadFileData.fileName);

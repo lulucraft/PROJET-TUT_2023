@@ -65,13 +65,12 @@ export class DataService {
     // Set hash before sending to server
     file.hash = hash;
 
-    //{ name: file.name, creationDate: new Date(), size: file.size, hash: file.hash } // mpFile: formData
     // Save file details in database
-    let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/file', file));
-    if (dbFile == null) {
-      alert("Erreur lors de la sauvegarde du fichier dans la base de données");
-      return null;
-    }
+    // let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/file', file));
+    // if (dbFile == null) {
+    //   alert("Erreur lors de la sauvegarde du fichier dans la base de données");
+    //   return null;
+    // }
 
     let formData = new FormData();
     let blob = new Blob([fileData]);//, { type: 'application/octet-stream' }
@@ -81,9 +80,38 @@ export class DataService {
 
     // , { headers: new HttpHeaders({ 'Content-Type': "multipart/form-data" })}
     // Send and save file on the server
-    this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, { params: { fileHash: file.hash } }).subscribe((data: any) => {//, file: file
-      console.log(data);
+    let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, { params: { fileHash: hash } }));
+    console.log(dbFile)
+
+    return dbFile.id;
+  }
+
+  async addSharedFile(file: File, fileData: globalThis.File, userSharerId: number): Promise<number | undefined | null> {
+    const hash = await this.generateFileHash(fileData).then((hash: string | null) => {
+      if (hash === null) {
+        alert("Erreur lors de la génération du hash du fichier");
+        return null;
+      }
+      return hash;
     });
+    if (hash === null) {
+      return null;
+    }
+
+    // Set hash before sending to server
+    file.hash = hash;
+
+    let formData = new FormData();
+    let blob = new Blob([fileData]);
+    formData.append('fileData', blob);
+
+    // Send and save file on the server
+    let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, {
+      params: {
+        user_sharer_id: userSharerId,
+        fileHash: hash
+      }
+    }));
 
     return dbFile.id;
   }
@@ -132,7 +160,7 @@ export class DataService {
   }
 
   hasUserSharerRight(userSharerId: number, right: string): Observable<boolean> {
-    return this.http.get<boolean>(this.apiBaseUrl + 'api/user/hasright', { params: { user_sharer_id: userSharerId, right_name: right }});
+    return this.http.get<boolean>(this.apiBaseUrl + 'api/user/hasright', { params: { user_sharer_id: userSharerId, right_name: right } });
   }
 
   enableRight(userShareRight: UserShareRight, right: Right, enable: boolean): Observable<UserShareRight> {

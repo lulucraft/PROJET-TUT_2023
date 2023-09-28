@@ -1,6 +1,7 @@
 package fr.nepta.cloud.service;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import fr.nepta.cloud.model.Right;
@@ -11,9 +12,9 @@ public interface UserShareRightService {
 
 	UserShareRight saveUserShareRight(UserShareRight usr);
 
-	Collection<UserShareRight> getUsersSharedRights();
+//	Collection<UserShareRight> getUsersSharedRights();
 
-	UserShareRight getUserShareRight(long id);
+	Optional<UserShareRight> getUserShareRight(long id);
 
 	UserShareRight shareRightsToUser(User user, User userToShare, Set<Right> userShareRights);
 
@@ -28,6 +29,8 @@ public interface UserShareRightService {
 	boolean hasShareRights(User user);
 
 	void deleteUserShareRight(UserShareRight userShareRight);
+
+	Collection<UserShareRight> getUserShareRightsFromUserSharer(User user);
 
 //	Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner);
 }

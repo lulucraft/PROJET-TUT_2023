@@ -92,10 +92,13 @@ export class AuthService {
                 return;
               }
 
+              // Get redirect url from url
+              let returnUrl = this.route.snapshot.queryParams['returnUrl'];
               this.router.navigate(['/otplogin'], {
                 state: {
                   user: user
-                }
+                },
+                queryParams: { returnUrl: (returnUrl ? returnUrl : undefined) }
               });
               return;
             }

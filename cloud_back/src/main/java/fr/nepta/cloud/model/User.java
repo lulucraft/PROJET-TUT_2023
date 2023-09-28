@@ -17,8 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -67,7 +67,7 @@ public class User implements Cloneable {
 	//	private String refreshToken;
 
 	//	@Column(name = "offer_id")
-	@OneToOne
+	@ManyToOne
 	private Offer offer;
 
 	@OneToMany(fetch = FetchType.LAZY)
@@ -84,6 +84,7 @@ public class User implements Cloneable {
 //			)
 	private Collection<File> files = new ArrayList<>();
 
+//	@EqualsAndHashCode.Exclude
 	@ManyToMany(fetch = FetchType.LAZY)
 	private Set<UserShareRight> userShareRights = new HashSet<>();
 

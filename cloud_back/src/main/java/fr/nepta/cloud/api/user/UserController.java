@@ -2,6 +2,7 @@ package fr.nepta.cloud.api.user;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
@@ -76,7 +77,7 @@ public class UserController {
 		return us.getUser(auth.getName()).getFiles().stream().filter(f -> f.isArchived() == false).toList();
 	}
 
-	@RolesAllowed({"USER"})
+	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "sharedfiles")
 	public Collection<File> getSharedFiles(@RequestParam(name = "user_sharer_id") long userSharerId) throws Exception {//@RequestParam String username
 //		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -101,14 +102,39 @@ public class UserController {
 		return files;
 	}
 
+//	@RolesAllowed({"USER","ADMIN"})
+//	@PutMapping(value = "file")
+//	public File addFile(@RequestBody File file) {//@RequestBody File file
+//		log.info("Saving file {} on the database", file.getId());
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash(), false));
+//		try {
+//			us.addFileToUser(us.getUser(auth.getName()), f);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return f;
+//	}
+
 	@RolesAllowed({"USER","ADMIN"})
-	@PutMapping(value = "file")
-	public File addFile(@RequestBody File file) {//@RequestBody File file
-		log.info("Saving file {} on the database", file.getId());
+	@PutMapping(value = "sharedfile")
+	public File addSharedFile(@RequestBody File file, @RequestParam(name = "user_sharer_id") long userSharerId) throws Exception {
+		log.info("Saving shared file {} on the database", file.getId());
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		User userSharer = us.getUser(userSharerId);
+		if (user == userSharer) {
+			throw new IllegalAccessError("Vous ne pouvez pas partager à vous même");
+		}
+
+		Right addRight = rgts.getRight("Ajouter");
+		if (!usrs.getUserShareRightFromUserFileOwner(user, userSharer).getRights().contains(addRight)) {
+			throw new IllegalAccessError("Vous n'avez pas la permission");
+		}
+
 		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash(), false));
 		try {
-			us.addFileToUser(us.getUser(auth.getName()), f);
+			us.addFileToUser(userSharer, f);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -122,18 +148,12 @@ public class UserController {
 	@RolesAllowed({"USER","ADMIN"})
 	@PutMapping(value = "filedata")//UploadFileData uploadFileData
 	public File uploadFile(@RequestBody MultipartFile fileData, @RequestParam String fileHash) throws IOException {//, @RequestParam String fileHash @RequestBody File file
-		// Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		// Sauvegarde du fichier sur le disque
-		// TODO
 		////		Path tempFile = null;
 		////		try {
 		////			tempFile = Files.createTempFile(mpFile.getName(), fileHash);
 		////		} catch (IOException e1) {
 		////			e1.printStackTrace();
-		////		}
-		////		if (tempFile == null) {
-		////			log.error("Fichier '{}' null", mpFile.getName());
-		////			return null;
 		////		}
 		//
 		////		java.io.File file = tempFile.toFile();//new java.io.File(mpFile.getName());
@@ -144,9 +164,6 @@ public class UserController {
 		//		} catch (IllegalStateException | IOException e) {
 		//			e.printStackTrace();
 		//		}
-		//		System.err.println(file.getAbsolutePath());
-		//		System.err.println(file.getPath());
-		////		sftpUploadGateway.read("/data/");
 		System.err.println(fileHash);
 		UploadFileData ufd = new UploadFileData();
 		ufd.mpFile = fileData;
@@ -209,8 +226,8 @@ public class UserController {
 			}
 		}
 
-		us.archiveUserFile(user, fileId);
 		sftpUploadGateway.archiveFile(fileId);
+		us.archiveUserFile(user, fileId);
 		return "{\"message\":\"Le fichier a été supprimé\"}";
 	}
 
@@ -221,7 +238,7 @@ public class UserController {
 		return rgts.getRights();
 	}
 
-	@RolesAllowed({"USER"})
+	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "hasright")
 	public boolean hasRight(@RequestParam(name = "user_sharer_id") long userSharerId, @RequestParam(name = "right_name") String rightName) throws Exception {
 		Right right = rgts.getRight(rightName);
@@ -239,10 +256,12 @@ public class UserController {
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "userssharedrights")
 	public Collection<UserShareRight> getUsersSharedRights() {
-		return usrs.getUsersSharedRights();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		return usrs.getUserShareRightsFromUserSharer(user);
 	}
 	
-	@RolesAllowed({"USER"})
+	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "userssharer")
 	public Collection<User> getUsersSharer() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -253,7 +272,7 @@ public class UserController {
 	@RolesAllowed({"USER","ADMIN"})
 	@PostMapping(value = "enableright")
 	public UserShareRight enableRight(@RequestParam(name = "user_share_right_id") long userShareRightId, @RequestParam(name = "right_id") long rightId, @RequestParam boolean enable) {
-		UserShareRight userShareRight = usrs.getUserShareRight(userShareRightId);
+		UserShareRight userShareRight = usrs.getUserShareRight(userShareRightId).get();
 		if (userShareRight == null) {
 			log.error("user_share_right '{}' not found in the database", userShareRightId);
 			return null;
@@ -266,7 +285,7 @@ public class UserController {
 		}
 
 		if (right.getName().equalsIgnoreCase("Afficher")) {
-			// On supprime dans tous les puisque si appel de cette méthode, c'est qu'on souhaite désactiver la perm comme le droit "Afficher" est activé par défaut
+			// On supprime dans tous les cas puisque si appel de cette méthode, c'est qu'on souhaite désactiver la perm comme le droit "Afficher" est activé par défaut
 			us.getUserFromUserShareRight(userShareRight).getUserShareRights().remove(userShareRight);
 			usrs.deleteUserShareRight(userShareRight);
 			return null;
@@ -351,7 +370,7 @@ public class UserController {
 		us.setDarkMode(us.getUser(auth.getName()), darkModeEnabled);
 	}
 
-	@RolesAllowed("USER")
+	@RolesAllowed({"USER","ADMIN"})
 	@PostMapping(value = "order")
 	public void sendOrder(@RequestBody Order order) throws Exception {
 		log.info("Saving order {} on the database",  order.getPaypalId());
@@ -370,7 +389,7 @@ public class UserController {
 			return;
 		}
 
-		ors.saveOrder(order);
+		order = ors.saveOrder(order);
 
 		// // Avoid bypass of admin validation
 		// conge.setValidated(false);
