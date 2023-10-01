@@ -106,6 +106,16 @@
         <td mat-cell *matCellDef="let file">{{ file.modificationDate | date: 'medium' }}</td>
       </ng-container>
 
+      <!-- Check hash button -->
+      <ng-container matColumnDef="btn_check" style="max-width: 65px;width: 65px;">
+        <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
+        <td mat-cell *matCellDef="let file">
+          <button mat-mini-fab (click)="checkFileHash(file)" aria-label="test" *ngIf="hasCheckHashRight()">
+            <mat-icon>check</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
       <!-- Download button -->
       <ng-container matColumnDef="btn_download" style="max-width: 65px;width: 65px;">
         <th mat-header-cell *matHeaderCellDef style="width: 0;"></th>
@@ -144,7 +154,7 @@
 
   <!-- <mat-divider style="margin: 15px 0;"></mat-divider> -->
 
-    <!-- No row label -->
+  <!-- No row label -->
   <!--  <div style="margin-top: 10px;" *ngIf="!filesRequestsNotValidated.data.length">
       <div [ngSwitch]="filterNotValidated">
         <div *ngSwitchCase="'inprogress'">Aucune demande de congés en cours</div>

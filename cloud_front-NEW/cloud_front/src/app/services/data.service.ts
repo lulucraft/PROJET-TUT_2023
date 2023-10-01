@@ -73,10 +73,10 @@ export class DataService {
     // }
 
     let formData = new FormData();
-    let blob = new Blob([fileData]);//, { type: 'application/octet-stream' }
-    formData.append('fileData', blob);
+    // let blob = new Blob([fileData]);//, { type: 'application/octet-stream' }
+    formData.set('fileData', fileData);
     // formData.append('hash', file.hash);
-    console.log(blob);
+    console.log(fileData);
 
     // , { headers: new HttpHeaders({ 'Content-Type': "multipart/form-data" })}
     // Send and save file on the server
@@ -105,8 +105,8 @@ export class DataService {
     file.hash = hash;
 
     let formData = new FormData();
-    let blob = new Blob([fileData]);
-    formData.append('fileData', blob);
+    // let blob = new Blob([fileData]);
+    formData.set('fileData', fileData);
 
     // Send and save file on the server
     let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, {
@@ -136,6 +136,25 @@ export class DataService {
       catchError((err) => throwError(() => {
         console.error(err);
         this.snackBar.open('Erreur lors du téléchargement du fichier ' + file.name, '', { duration: 2500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      }))
+    );
+  }
+
+  checkFileHash(file: File): Observable<Promise<string | null>> {
+    if (!file.id) {
+      this.snackBar.open('Le fichier ' + file.name + ' est invalide', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      throw new Error("Fichier invalide");
+    }
+
+    return this.http.get(this.apiBaseUrl + 'api/user/file/checkhash', { params: { file_id: file.id }, responseType: 'blob' }).pipe(map(
+      async (data: any) => {
+        const hash = await this.generateFileHash(data);
+        console.info('Check hash : ' + hash);
+        return hash;
+      }),
+      catchError((err) => throwError(() => {
+        console.error(err);
+        this.snackBar.open('Erreur lors de la vérification du hash du fichier ' + file.id, '', { duration: 2500, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
       }))
     );
   }

@@ -149,6 +149,7 @@ public class UserController {
 	public File uploadFile(@RequestBody MultipartFile fileData, @RequestParam String fileHash, @RequestParam(name = "user_sharer_id", required = false) Long userSharerId) throws IOException {//, @RequestParam String fileHash @RequestBody File file
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User user = us.getUser(auth.getName());
+		System.err.println(fileData.getOriginalFilename());
 
 		// Sauvegarde fichier partagé
 		if (userSharerId != null) {
@@ -160,6 +161,10 @@ public class UserController {
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new IllegalAccessError("Utilisateur partageur introuvable");
+			}
+
+			if (userSharer == null) {
+				throw new IllegalAccessError("Utilisateur partageur " + userSharerId + " introuvable");
 			}
 
 			if (user == userSharer) {
@@ -177,12 +182,13 @@ public class UserController {
 
 		if (user.getOffer() == null) {
 			log.error("User '{}' has no offer but an adding file request is submitted");
+			return null;
 		}
 
 		System.err.println(fileHash);
 
 		// Sauvegarde du fichier en base
-		File file = fs.saveFile(new File(null, fileData.getName(), new Date(), null, fileData.getSize(), fileHash, false));
+		File file = fs.saveFile(new File(null, fileData.getOriginalFilename(), new Date(), null, fileData.getSize(), fileHash, false));
 
 		try {
 			us.addFileToUser(user, file);
@@ -228,6 +234,41 @@ public class UserController {
 				//e.printStackTrace();
 				throw new IllegalAccessException(e.getMessage());
 			}
+		}
+
+		return null;
+	}
+	
+	@GetMapping(value = "file/checkhash")
+	public byte[] checkHash(@RequestParam(name = "file_id") long fileId) throws IllegalAccessException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		User fileOwner = fs.getFileOwner(fileId);
+		boolean hasRight = false;
+
+		if (fileOwner == user) {
+			hasRight = true;
+		}
+
+		Right checkHashRight = rgts.getRight("Vérifier intégrité");
+		UserShareRight usr = usrs.getUserShareRightFromUserAndUserSharer(user, fileOwner);
+		// If user is in the shared user && If user has check hash right
+		if (fileOwner.getUserShareRights().contains(usr) && usr.getRights().contains(checkHashRight)) {
+			hasRight = true;
+		}
+
+		File file = fs.getFile(fileId);
+		if (file == null) throw new IllegalStateException("Fichier introuvable");
+
+		if (hasRight) {
+			try {
+				return IOUtils.toByteArray(sftpUploadGateway.downloadFile(fileId));
+			} catch (IOException e) {
+				//e.printStackTrace();
+				throw new IllegalAccessException(e.getMessage());
+			}
+
+			//	return this.generateHash(...);
 		}
 
 		return null;

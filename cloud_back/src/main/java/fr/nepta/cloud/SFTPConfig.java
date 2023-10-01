@@ -59,7 +59,7 @@ public class SFTPConfig {
 		factory.setAllowUnknownKeys(true);
 //		System.err.println(sftpPrivateKey);
 //		System.err.println(sftpPrivateKeyPassphrase);
-		System.err.println(sftpPasword);
+//		System.err.println(sftpPasword);
 		System.err.println(sftpRemoteDirectory);
 		return new CachingSessionFactory<DirEntry>(factory);
 	}

@@ -38,7 +38,7 @@ public class FileServiceImpl implements FileService {
 		log.info("Fetching file '{}'", id);
 		return fileRepo.findById(id).get();
 	}
-	
+
 	@Override
 	public File getFile(String name) {
 		log.info("Fetching file '{}'", name);
@@ -47,6 +47,7 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public User getFileOwner(long fileId) {
+		log.info("Fetching file '{}'", fileId);
 		return fileRepo.findFileOwner(fileId);
 	}
 

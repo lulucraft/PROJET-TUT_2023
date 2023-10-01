@@ -109,14 +109,14 @@ export class CheckoutComponent implements OnInit {
         }
       });
 
-      if (id == 1) {
-        // Offer particulier
-      } else if (id == 2) {
-        // Offer professionel
-      } else {
-        alert("Offre invalide");
-        this.home();
-      }
+      // if (id == 1) {
+      //   // Offer particulier
+      // } else if (id == 2) {
+      //   // Offer professionel
+      // } else {
+      //   alert("Offre invalide");
+      //   this.home();
+      // }
     });
 
   }

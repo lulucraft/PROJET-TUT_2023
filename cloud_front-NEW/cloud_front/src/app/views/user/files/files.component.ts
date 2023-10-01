@@ -23,7 +23,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
     // { name: 'Fichier1', creationDate: new Date(2000), modificationDate: new Date(2000), data: 'Hello, world!' },
   ];
   public filesDataSource: MatTableDataSource<File> = new MatTableDataSource<File>(this.filesCpt);
-  public displayedColumns: string[] = ['select', 'label', 'credate', 'editdate', 'btn_download', 'btn_del'];
+  public displayedColumns: string[] = ['select', 'label', 'credate', 'editdate', 'btn_check', 'btn_download', 'btn_del'];
   public sharedMode: boolean = false;
   public usersSharer?: User[];
 
@@ -32,6 +32,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
   private sharedDownloadRight: boolean = false;
   private sharedDeleteRight: boolean = false;
   private sharedAddFileRight: boolean = false;
+  private sharedCheckHashRight: boolean = false;
 
   public selection = new SelectionModel<File>(true, []);
   public selectedUserSharer?: User;
@@ -97,6 +98,7 @@ export class FilesComponent implements OnInit, AfterViewInit {
     this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Télécharger").subscribe((hasDownloadRight: boolean) => this.sharedDownloadRight = hasDownloadRight);
     this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Supprimer").subscribe((hasDeleteRight: boolean) => this.sharedDeleteRight = hasDeleteRight);
     this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Ajouter").subscribe((hasAddFileRight: boolean) => this.sharedAddFileRight = hasAddFileRight);
+    this.dataService.hasUserSharerRight(this.selectedUserSharer.id, "Vérifier intégrité").subscribe((hasCheckHashRight: boolean) => this.sharedCheckHashRight = hasCheckHashRight);
     // } else {
     //   console.info("Pas d'utilisateur partageur sélectionné ou l'utilisateur partageur n'a pas d'id")
     // }
@@ -139,6 +141,10 @@ export class FilesComponent implements OnInit, AfterViewInit {
 
   hasAddFileRight(): boolean {
     return !this.sharedMode || this.sharedAddFileRight;
+  }
+
+  hasCheckHashRight(): boolean {
+    return !this.sharedMode || this.sharedCheckHashRight;
   }
 
   isSelectionVisible(): boolean {
@@ -263,6 +269,19 @@ export class FilesComponent implements OnInit, AfterViewInit {
   downloadFile(file: File): void {
     this.snackBar.open("Téléchargement du fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
     this.dataService.downloadFile(file).subscribe();
+  }
+
+  // Vérifier intégrité
+  checkFileHash(file: File): void {
+    this.snackBar.open("Vérification de l'intégrité du fichier en cours...", '', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container'] });
+    this.dataService.checkFileHash(file).subscribe(async (hashPromise: Promise<string | null>) => {
+      let hash: string | null = await hashPromise;
+      if (hash === file.hash) {
+        this.snackBar.open("Le fichier actuel est identique à celui lors de sa création en base de données", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'success'] });
+      } else {
+        this.snackBar.open("Le fichier a été modifié depuis son ajout en base de données !", '', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      }
+    });
   }
 
   onSelectionChange(event: MatSelectChange): void {

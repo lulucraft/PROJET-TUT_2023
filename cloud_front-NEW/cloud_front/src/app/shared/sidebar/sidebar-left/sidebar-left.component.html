@@ -39,7 +39,7 @@
     </li>
 
     <!-- Fichiers -->
-    <li *ngIf="isAuthenticated() && hasOffer() && getOffer() === 'Professionnel'">
+    <li *ngIf="isAuthenticated() && hasOffer() && getOffer()!.includes('Professionnel')">
       <button mat-button (click)="users()">
         <mat-icon>lock</mat-icon>
         <span>Droits utilisateurs</span>

@@ -14,7 +14,7 @@ public interface FileRepo extends JpaRepository<File, Long> {
 
 	Collection<File> findAllByArchived(boolean archived);
 
-	@Query("SELECT u FROM user u JOIN u.files uf JOIN file f ON f.id = :fileId")// JOIN user_files uf ON uf.user_id = u.id AND files_id = f.id
+	@Query("SELECT u FROM user u JOIN u.files uf JOIN file f ON uf.id = f.id WHERE f.id = :fileId")// JOIN user_files uf ON uf.user_id = u.id AND files_id = f.id
 	User findFileOwner(long fileId);
 
 }
