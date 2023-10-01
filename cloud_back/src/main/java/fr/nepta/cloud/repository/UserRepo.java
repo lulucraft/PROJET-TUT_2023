@@ -18,6 +18,9 @@ public interface UserRepo extends JpaRepository<User, Long> {
 	@Query("SELECT u FROM user u JOIN u.userShareRights usr ON usr.user.id = :userId")
 	Collection<User> findUsersSharerByUserId(long userId);
 
+//	@Query("DELETE FROM user u JOIN u.userShareRights usr ON usr.id = :userShareRightId WHERE u.id = :userSharerId")
+//	void removeUserShareRightFromUser(long userSharerId, long userShareRightId);
+
 //	@Query("SELECT o FROM user u JOIN u.orders o WHERE u.id = :userId AND o.archived = false")
 //	List<Order> findOrdersNotArchived(long userId);
 

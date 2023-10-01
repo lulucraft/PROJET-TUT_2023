@@ -79,8 +79,6 @@ export class UsersComponent {
   }
 
   enableRight(userShareRight: UserShareRight, rightName: string, enable: boolean): void {
-    console.log(userShareRight)
-    console.log(enable)
     let right = this.findRight(rightName);
     if (!right) {
       this.snackBar.open("Erreur interne. Impossible de trouver le droit", '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });

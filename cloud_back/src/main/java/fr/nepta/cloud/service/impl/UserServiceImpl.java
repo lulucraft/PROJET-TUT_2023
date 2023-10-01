@@ -165,12 +165,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 		if (user.getOffer() == null) {
 			log.error("L'utilisateur '{}' n'a pas souscrit d'offre mais tente d'ajouter des fichiers", user.getId());
-			return;
+			throw new IllegalStateException("Vous n'avez souscrit à aucune offre");
 		}
 
 		if (checkUserOffer(user) == true) {
 			// Révocation de l'offre de l'utilisateur si offre expirée
 			user.setOffer(null);
+			// Reset des partages
+			user.setUserShareRights(null);
 			log.error("Révocation de l'offre de l'utilisateur '{}' arrivée à expiration", user.getId());
 			return;
 		}
@@ -214,10 +216,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		// Durée * quantité souscrite
 		expiration.add(Calendar.MONTH, offerMonthsDuration * or.getQuantity());
 		//LocalDate.now().plusMonths(offerMonthsDuration * or.getQuantity())
-		System.err.println(new Date().toString());
+		//	System.err.println(new Date().toString());
 		System.err.println(expiration.getTime().toString());
 		// Offre expirée si date de fin de l'offre après la date d'aujourd'hui
-		if (expiration.getTime().after(new Date())) {
+		if (expiration.getTime().before(new Date())) {
 			log.error("L'utilisateur '{}' n'a aucune commande non expirée liée à son offre", user.getId());
 			// Révocation de l'offre de l'utilisateur si offre expirée
 			//user.setOffer(null);

@@ -2,7 +2,6 @@ package fr.nepta.cloud.api.user;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
@@ -44,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor @Slf4j
 //@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
+@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
 @RequestMapping("api/user/")
 public class UserController {
@@ -116,30 +115,30 @@ public class UserController {
 //		return f;
 //	}
 
-	@RolesAllowed({"USER","ADMIN"})
-	@PutMapping(value = "sharedfile")
-	public File addSharedFile(@RequestBody File file, @RequestParam(name = "user_sharer_id") long userSharerId) throws Exception {
-		log.info("Saving shared file {} on the database", file.getId());
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		User user = us.getUser(auth.getName());
-		User userSharer = us.getUser(userSharerId);
-		if (user == userSharer) {
-			throw new IllegalAccessError("Vous ne pouvez pas partager à vous même");
-		}
-
-		Right addRight = rgts.getRight("Ajouter");
-		if (!usrs.getUserShareRightFromUserFileOwner(user, userSharer).getRights().contains(addRight)) {
-			throw new IllegalAccessError("Vous n'avez pas la permission");
-		}
-
-		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash(), false));
-		try {
-			us.addFileToUser(userSharer, f);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return f;
-	}
+//	@RolesAllowed({"USER","ADMIN"})
+//	@PutMapping(value = "sharedfile")
+//	public File addSharedFile(@RequestBody File file, @RequestParam(name = "user_sharer_id") long userSharerId) throws Exception {
+//		log.info("Saving shared file {} on the database", file.getId());
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		User user = us.getUser(auth.getName());
+//		User userSharer = us.getUser(userSharerId);
+//		if (user == userSharer) {
+//			throw new IllegalAccessError("Vous ne pouvez pas partager à vous même");
+//		}
+//
+//		Right addRight = rgts.getRight("Ajouter");
+//		if (!usrs.getUserShareRightFromUserAndUserSharer(user, userSharer).getRights().contains(addRight)) {
+//			throw new IllegalAccessError("Vous n'avez pas la permission");
+//		}
+//
+//		File f = fs.saveFile(new File(null, file.getName(), new Date(), null, file.getSize(), file.getHash(), false));
+//		try {
+//			us.addFileToUser(userSharer, f);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return f;
+//	}
 
 	//	private static class UploadFileData {
 	//		public File file;
@@ -147,30 +146,58 @@ public class UserController {
 
 	@RolesAllowed({"USER","ADMIN"})
 	@PutMapping(value = "filedata")//UploadFileData uploadFileData
-	public File uploadFile(@RequestBody MultipartFile fileData, @RequestParam String fileHash) throws IOException {//, @RequestParam String fileHash @RequestBody File file
-		// Sauvegarde du fichier sur le disque
-		////		Path tempFile = null;
-		////		try {
-		////			tempFile = Files.createTempFile(mpFile.getName(), fileHash);
-		////		} catch (IOException e1) {
-		////			e1.printStackTrace();
-		////		}
-		//
-		////		java.io.File file = tempFile.toFile();//new java.io.File(mpFile.getName());
-		//		java.io.File file = new java.io.File(mpFile.getName());
-		//		try {
-		//			// Put mpFile data into tempFile data
-		//			mpFile.transferTo(file);
-		//		} catch (IllegalStateException | IOException e) {
-		//			e.printStackTrace();
-		//		}
+	public File uploadFile(@RequestBody MultipartFile fileData, @RequestParam String fileHash, @RequestParam(name = "user_sharer_id", required = false) Long userSharerId) throws IOException {//, @RequestParam String fileHash @RequestBody File file
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+
+		// Sauvegarde fichier partagé
+		if (userSharerId != null) {
+			log.info("Saving shared file on the database");
+
+			User userSharer;
+			try {
+				userSharer = us.getUser(userSharerId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new IllegalAccessError("Utilisateur partageur introuvable");
+			}
+
+			if (user == userSharer) {
+				throw new IllegalAccessError("Vous ne pouvez pas partager à vous même");
+			}
+
+			Right addRight = rgts.getRight("Ajouter");
+			if (!usrs.getUserShareRightFromUserAndUserSharer(user, userSharer).getRights().contains(addRight)) {
+				throw new IllegalAccessError("Vous n'avez pas la permission");
+			}
+
+			// On défini l'utilisateur qui va être assigné au fichier (partageur comme propriétaire)
+			user = userSharer;
+		}
+
+		if (user.getOffer() == null) {
+			log.error("User '{}' has no offer but an adding file request is submitted");
+		}
+
 		System.err.println(fileHash);
+
+		// Sauvegarde du fichier en base
+		File file = fs.saveFile(new File(null, fileData.getName(), new Date(), null, fileData.getSize(), fileHash, false));
+
+		try {
+			us.addFileToUser(user, file);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Impossible to add file '{}' to user '{}'", file.getId(), user.getId());
+			return null;
+		}
+
 		UploadFileData ufd = new UploadFileData();
 		ufd.mpFile = fileData;
-		//		ufd.file = file;
-		File file = fs.saveFile(new File(null, fileData.getName(), new Date(), null, fileData.getSize(), fileHash, false));
 		ufd.fileName = String.valueOf(file.getId());
+		// Sauvegarde du fichier sur le disque
 		sftpUploadGateway.upload(ufd);
+
 		return file;
 	}
 
@@ -187,7 +214,7 @@ public class UserController {
 		}
 
 		Right downloadRight = rgts.getRight("Télécharger");
-		UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
+		UserShareRight usr = usrs.getUserShareRightFromUserAndUserSharer(user, fileOwner);
 		// If user is in the shared user && If user has download right
 		if (fileOwner.getUserShareRights().contains(usr) && usr.getRights().contains(downloadRight)) {
 			//user.getFiles().contains(fs.getFile(file.getId()))
@@ -220,7 +247,7 @@ public class UserController {
 
 		if (!hasRight) {
 			Right deleteRight = rgts.getRight("Supprimer");
-			UserShareRight usr = usrs.getUserShareRightFromUserFileOwner(user, fileOwner);
+			UserShareRight usr = usrs.getUserShareRightFromUserAndUserSharer(user, fileOwner);
 			if (deleteRight == null || !usr.getRights().contains(deleteRight)) {
 				return null;
 			}
@@ -235,6 +262,11 @@ public class UserController {
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "rights")
 	public Collection<Right> getRights() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = us.getUser(auth.getName());
+		if (user.getOffer() == null || !user.getOffer().getName().contains("Professionnel")) {
+			throw new IllegalStateException("Vous devez disposer d'une offre professionnel");
+		}
 		return rgts.getRights();
 	}
 
@@ -249,18 +281,23 @@ public class UserController {
 		User userSharer = us.getUser(userSharerId);
 		if (userSharer == null) return false;
 
-		UserShareRight userShareRight = usrs.getUserShareRightFromUserFileOwner(user, userSharer);
+		UserShareRight userShareRight = usrs.getUserShareRightFromUserAndUserSharer(user, userSharer);
+
 		return userShareRight != null && userShareRight.getRights().contains(right);
 	}
 
 	@RolesAllowed({"USER","ADMIN"})
-	@GetMapping(value = "userssharedrights")
+	@GetMapping(value = "userssharerights")
 	public Collection<UserShareRight> getUsersSharedRights() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User user = us.getUser(auth.getName());
-		return usrs.getUserShareRightsFromUserSharer(user);
+		if (user.getOffer() == null || !user.getOffer().getName().contains("Professionnel")) {
+			throw new IllegalStateException("Vous devez disposer d'une offre professionnel");
+		}
+
+		return usrs.getUserShareRightsFromUserSharer(user);//Arrays.asList();
 	}
-	
+
 	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "userssharer")
 	public Collection<User> getUsersSharer() {
@@ -285,16 +322,19 @@ public class UserController {
 		}
 
 		if (right.getName().equalsIgnoreCase("Afficher")) {
-			// On supprime dans tous les cas puisque si appel de cette méthode, c'est qu'on souhaite désactiver la perm comme le droit "Afficher" est activé par défaut
-			us.getUserFromUserShareRight(userShareRight).getUserShareRights().remove(userShareRight);
-			usrs.deleteUserShareRight(userShareRight);
+			// On supprime dans tous les cas tous les droits puisque si appel de cette méthode, c'est qu'on souhaite désactiver la perm "Afficher" comme elle est activée par défaut
+//			us.removeUserShareRight(user, userShareRight);
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			User user = us.getUser(auth.getName());
+//			usrs.removeAllRightsOfUserShareRight(userShareRight);
+			usrs.deleteUserShareRight(user, userShareRight);
 			return null;
 		}
 
 		if (enable) {
 			return usrs.addRightToUserShareRight(userShareRight, right);
 		} else {
-			return usrs.removeRightToUserShareRight(userShareRight, right);
+			return usrs.removeRightOfUserShareRight(userShareRight, right);
 		}
 	}
 
@@ -313,6 +353,10 @@ public class UserController {
 			throw new IllegalStateException("Impossible de partager des droits à soi-même");
 		}
 		User user = us.getUser(auth.getName());
+
+		if (user.getOffer() == null || !user.getOffer().getName().contains("Professionnel")) {
+			throw new IllegalStateException("Vous devez disposer d'une offre professionnel");
+		}
 
 		//usrs.saveUserShareRight(usr);
 		return usrs.shareRightsToUser(user, userShare, null);

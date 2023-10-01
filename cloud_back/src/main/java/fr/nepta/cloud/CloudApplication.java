@@ -56,23 +56,66 @@ public class CloudApplication {
 				rs.saveRole(new Role(null, "ADMIN"));
 			}
 
-			if (os.getOffer("Particulier") == null) {
+			// PARTICULIER
+			if (os.getOffer("Particulier 250GB") == null) {
 				Set<String> advantages = new HashSet<>();
 				advantages.add("Tous les formats de fichiers");
 
 				Set<String> disadvantages = new HashSet<>();
 				disadvantages.add("Pas de partage de fichiers");
+				advantages.add("Espace de stockage de 250GB");
 
-				os.saveOffer(new Offer(null, "Particulier", 10, 1, advantages, disadvantages));
+				os.saveOffer(new Offer(null, "Particulier 250GB", 7, 1, advantages, disadvantages));
 			}
 
-			if (os.getOffer("Professionnel") == null) {
-//				System.err.println(advRepor.getAdvantagesByName("Tous les formats de fichiers"));
+			if (os.getOffer("Particulier 500GB") == null) {
 				Set<String> advantages = new HashSet<>();
 				advantages.add("Tous les formats de fichiers");
-				advantages.add("Partage fichiers illimité");
 
-				os.saveOffer(new Offer(null, "Professionnel", 20, 1, advantages, new HashSet<>()));
+				Set<String> disadvantages = new HashSet<>();
+				disadvantages.add("Pas de partage de fichiers");
+				advantages.add("Espace de stockage de 500GB");
+
+				os.saveOffer(new Offer(null, "Particulier 500GB", 10, 1, advantages, disadvantages));
+			}
+
+			if (os.getOffer("Particulier 1TO") == null) {
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+				advantages.add("Espace de stockage de 1TO");
+
+				Set<String> disadvantages = new HashSet<>();
+				disadvantages.add("Pas de partage de fichiers");
+
+				os.saveOffer(new Offer(null, "Particulier 1TO", 14, 1, advantages, disadvantages));
+			}
+
+			// PRO
+			if (os.getOffer("Professionnel 2TO") == null) {
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+				advantages.add("Partage utilisateurs illimité");
+				advantages.add("Espace de stockage de 2TO");
+
+				os.saveOffer(new Offer(null, "Professionnel 2TO", 19, 1, advantages, new HashSet<>()));
+			}
+
+			if (os.getOffer("Professionnel 5TO") == null) {
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+				advantages.add("Partage utilisateurs illimité");
+				advantages.add("Espace de stockage de 5TO");
+
+				os.saveOffer(new Offer(null, "Professionnel 5TO", 24, 1, advantages, new HashSet<>()));
+			}
+
+			if (os.getOffer("Professionnel 10TO") == null) {
+				Set<String> advantages = new HashSet<>();
+				advantages.add("Tous les formats de fichiers");
+				advantages.add("Partage utilisateurs illimité");
+				advantages.add("Espace de stockage de 10TO");
+
+				os.saveOffer(new Offer(null, "Professionnel 10TO", 29, 1, advantages, new HashSet<>()));
 			}
 
 			// Create default users
@@ -95,14 +138,14 @@ public class CloudApplication {
 			}
 
 			// Create test files
-			if (ns.getFile("Fichier1") == null) {
-				ns.saveFile(new File(null, "Fichier1", new Date(), null, 0, "fezfezzef", false));
-			}
-			if (ns.getFile("Fichier2") == null) {
-				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg", false));
-			}
+//			if (ns.getFile("Fichier1") == null) {
+//				ns.saveFile(new File(null, "Fichier1", new Date(), null, 0, "fezfezzef", false));
+//			}
+//			if (ns.getFile("Fichier2") == null) {
+//				ns.saveFile(new File(null, "Fichier2", new Date(), null, 1, "rhtrgtrgrg", false));
+//			}
 
-			// Create test rights
+			// Create default rights
 			if (rgts.getRight("Afficher") == null) {
 				rgts.saveRight(new Right(null, "Afficher"));
 			}
@@ -127,19 +170,19 @@ public class CloudApplication {
 		mailSender.setUsername("admin@juline.tech");
 		mailSender.setPassword("MyS_fztv6TCN5mt!");
 
-//		Properties props = mailSender.getJavaMailProperties();
-//		props.put("mail.smtp.host", "ssl0.ovh.net");
-////		props.put("mail.smtp.ssl.trust", "ssl0.ovh.net");
-////		props.put("mail.transport.protocol", "smtp");
-////		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-//		props.put("mail.smtp.auth", "true");
-////		props.put("mail.smtp.user", "admin@juline.tech");
-////		props.put("mail.smtp.password", "MyS_fztv6TCN5mt!");
-////		props.put("mail.smtp.port", "587");
-//		props.put("mail.smtp.starttls.enable", "true");
-//		props.put("mail.smtp.starttls.required", "true");
-////		props.put("mail.smtp.ssl.enable", "true");
-//		props.put("mail.debug", "false");
+		//		Properties props = mailSender.getJavaMailProperties();
+		//		props.put("mail.smtp.host", "ssl0.ovh.net");
+		////		props.put("mail.smtp.ssl.trust", "ssl0.ovh.net");
+		////		props.put("mail.transport.protocol", "smtp");
+		////		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+		//		props.put("mail.smtp.auth", "true");
+		////		props.put("mail.smtp.user", "admin@juline.tech");
+		////		props.put("mail.smtp.password", "MyS_fztv6TCN5mt!");
+		////		props.put("mail.smtp.port", "587");
+		//		props.put("mail.smtp.starttls.enable", "true");
+		//		props.put("mail.smtp.starttls.required", "true");
+		////		props.put("mail.smtp.ssl.enable", "true");
+		//		props.put("mail.debug", "false");
 
 		return mailSender;
 	}

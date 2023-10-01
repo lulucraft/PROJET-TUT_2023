@@ -81,7 +81,10 @@ export class DataService {
     // , { headers: new HttpHeaders({ 'Content-Type': "multipart/form-data" })}
     // Send and save file on the server
     let dbFile: File = await lastValueFrom(this.http.put<File>(this.apiBaseUrl + 'api/user/filedata', formData, { params: { fileHash: hash } }));
-    console.log(dbFile)
+    if (!dbFile) {
+      this.snackBar.open('Erreur lors de la sauvegarde en base', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      return;
+    }
 
     return dbFile.id;
   }
@@ -112,6 +115,10 @@ export class DataService {
         fileHash: hash
       }
     }));
+    if (!dbFile) {
+      this.snackBar.open('Erreur lors de la sauvegarde en base', '', { duration: 2000, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
+      return;
+    }
 
     return dbFile.id;
   }
@@ -148,7 +155,7 @@ export class DataService {
   }
 
   getUsersSharedRights(): Observable<UserShareRight[]> {
-    return this.http.get<UserShareRight[]>(this.apiBaseUrl + 'api/user/userssharedrights');
+    return this.http.get<UserShareRight[]>(this.apiBaseUrl + 'api/user/userssharerights');
   }
 
   getUsersSharer(): Observable<User[]> {

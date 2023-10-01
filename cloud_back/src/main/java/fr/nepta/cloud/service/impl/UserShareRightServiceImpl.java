@@ -13,6 +13,7 @@ import fr.nepta.cloud.model.Right;
 import fr.nepta.cloud.model.User;
 import fr.nepta.cloud.model.UserShareRight;
 import fr.nepta.cloud.repository.RightRepo;
+import fr.nepta.cloud.repository.UserRepo;
 import fr.nepta.cloud.repository.UserShareRightRepo;
 import fr.nepta.cloud.service.UserShareRightService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 	private final UserShareRightRepo usrRepo;
 	@Autowired
 	private final RightRepo rgtRepo;
+	@Autowired
+	private final UserRepo usRepo;
 
 	@Override
 	public UserShareRight saveUserShareRight(UserShareRight usr) {
@@ -53,22 +56,24 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 	}
 
 	@Override
-	public UserShareRight getUserShareRightFromUserFileOwner(User user, User fileOwner) {
+	public UserShareRight getUserShareRightFromUserAndUserSharer(User user, User userSharer) {
+		log.info("Fetching user_share_right from user '{}' and user sharer '{}'", user.getId(), userSharer.getId());
 		Collection<UserShareRight> usrs = this.getUserShareRightsFromUser(user);
 		for (UserShareRight usr : usrs) {
-			for (UserShareRight ownerUsr : fileOwner.getUserShareRights()) {
+			for (UserShareRight ownerUsr : this.getUserShareRightsFromUserSharer(userSharer)) {
 				if (usr.getId() == ownerUsr.getId()) {
 					return usr;
 				}
 			}
 		}
+
 		return null;
 	}
 
 	@Override
 	public UserShareRight shareRightsToUser(User user, User userToShare, Set<Right> userRights) {
 		log.info("Adding user '{}' to shared users of ", userToShare.getId());
-		if (getUserShareRightFromUserFileOwner(userToShare, user) != null) {
+		if (getUserShareRightFromUserAndUserSharer(userToShare, user) != null) {
 			log.error("Utilisateur déjà partagé");
 			return null;
 		}
@@ -96,7 +101,7 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 	}
 
 	@Override
-	public UserShareRight removeRightToUserShareRight(UserShareRight usr, Right right) {
+	public UserShareRight removeRightOfUserShareRight(UserShareRight usr, Right right) {
 		log.info("Removing right '{}' from shared user '{}'", right.getId(), usr.getId());
 		usr.getRights().remove(right);
 		return usrRepo.save(usr);
@@ -108,19 +113,27 @@ public class UserShareRightServiceImpl implements UserShareRightService {
 	}
 
 	@Override
-	public void deleteUserShareRight(UserShareRight userShareRight) {
+	public void deleteUserShareRight(User userSharer, UserShareRight userShareRight) {
 		log.info("Deleting rights of user '{}'", userShareRight.getUser().getId());
+//		getUserShareRightsFromUser(userSharer).remove(userShareRight);
+		// Remove the sharing from user share
+		userSharer.getUserShareRights().remove(userShareRight);
+		// Save removing
+		usRepo.save(userSharer);
+//		usRepo.removeUserShareRightFromUser(userSharer.getId(), userShareRight.getId());
+		// Remove all associated rights
+//		for (Right right : userShareRight.getRights()) {
+//			usrRepo.removeRight(userShareRight.getId(), right);
+//		}
+		// Save removing
+		userShareRight = usrRepo.save(userShareRight);
+//		usrRepo.removeAllRightsOfUserShareRight(userShareRight);
 		usrRepo.delete(userShareRight);
 	}
 
 	@Override
-	public Collection<UserShareRight> getUserShareRightsFromUserSharer(User user) {
+	public Set<UserShareRight> getUserShareRightsFromUserSharer(User user) {
 		return usrRepo.findByUserSharerId(user.getId());
 	}
-
-//	@Override
-//	public Collection<UserShareRight> getUserShareRightFromUserAndUserOwner(User user, User fileOwner) {
-//		return null;
-//	}
 
 }

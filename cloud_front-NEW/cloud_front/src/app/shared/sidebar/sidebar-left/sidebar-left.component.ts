@@ -41,6 +41,10 @@ export class SidebarLeftComponent implements OnInit {
     return !!this.authService.currentUserValue?.offer;
   }
 
+  getOffer(): string | undefined {
+    return this.authService.currentUserValue?.offer;
+  }
+
   hasSharedFiles(): boolean {
     return !!this.authService.currentUserValue?.shared;
   }

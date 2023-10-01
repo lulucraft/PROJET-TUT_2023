@@ -15,7 +15,8 @@ public class MailService {
 		SimpleMailMessage message = new SimpleMailMessage();
 
 		message.setFrom("noreply@tuxit.site");
-		message.setTo("lucas.besson@outlook.fr");
+//		message.setTo("lucas.besson@outlook.fr");
+		message.setTo(email);
 		message.setSubject(mailObject);
         message.setText(mailContent);
 
