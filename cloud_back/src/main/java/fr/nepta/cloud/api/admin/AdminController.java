@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 //@CrossOrigin(origins = "https://back.intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"*"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
+@CrossOrigin(origins = {"https://tuxit.site/", "51.79.109.241"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
 @RestController
 @RequestMapping("api/admin/")
 public class AdminController {

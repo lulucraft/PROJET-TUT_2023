@@ -23,7 +23,8 @@ export class TokenHttpInterceptorInterceptor implements HttpInterceptor {
       request.url === this.apiBaseUrl + 'api/auth/logout' ||
       request.url === 'login' ||
       request.url === this.apiBaseUrl + 'api/auth/refreshtoken' ||
-      request.url === this.apiBaseUrl + 'api/auth/resetpassword') {
+      request.url === this.apiBaseUrl + 'api/auth/resetpassword' ||
+      request.url === this.apiBaseUrl + 'api/user/offers') {
       return next.handle(request);
     }
 

@@ -10,11 +10,12 @@ import { RegisterComponent } from './shared/auth/register/register.component';
 import { LoginComponent } from './shared/auth/login/login.component';
 import { FilesComponent } from './views/user/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
-import { CheckoutComponent } from './checkout/checkout.component';
+import { CheckoutComponent } from './views/user/checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
 import { CgvComponent } from './shared/cgv/cgv.component';
 import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
 import { UsersComponent } from './views/user/users/users.component';
+import { CguComponent } from './shared/cgu/cgu.component';
 
 @Injectable({ providedIn: 'root' })
 export class TemplatePageTitleStrategy extends TitleStrategy {
@@ -41,14 +42,14 @@ const routes: Routes = [
       // { path: 'account', component: AccountComponent },
       { path: 'users', component: UsersComponent },
       { path: 'files', component: FilesComponent },
-      { path: 'shared_files', component: FilesComponent }
+      { path: 'shared_files', component: FilesComponent },
+      { path: 'checkout/:id', component: CheckoutComponent }
     ]
   },
 
+  { path: 'cgu', component: CguComponent },
   { path: 'cgv', component: CgvComponent },
   { path: 'pricing', component: PricingComponent },
-
-  { path: 'checkout/:id', component: CheckoutComponent },
 
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

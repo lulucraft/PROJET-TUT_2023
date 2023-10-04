@@ -158,6 +158,9 @@ public class CloudApplication {
 			if (rgts.getRight("Ajouter") == null) {
 				rgts.saveRight(new Right(null, "Ajouter"));
 			}
+			if (rgts.getRight("Vérifier intégrité") == null) {
+				rgts.saveRight(new Right(null, "Vérifier intégrité"));
+			}
 		};
 	}
 

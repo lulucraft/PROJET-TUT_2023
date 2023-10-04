@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiRoot: 'https://localhost:8080/'
+  apiRoot: 'https://tuxit.site:8080/'
 };

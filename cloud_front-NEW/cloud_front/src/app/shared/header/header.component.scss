@@ -73,4 +73,10 @@ header {
   color: #fff8e6;
   font-size: 15px;
   vertical-align: middle;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 }

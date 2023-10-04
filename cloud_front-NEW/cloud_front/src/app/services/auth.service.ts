@@ -79,7 +79,11 @@ export class AuthService {
       .set('password', user.password);
     if (otp_code) params = params.set('otp_code', otp_code);
 
-    return this.http.post<JWTToken>(this.apiBaseUrl + 'api/auth/login', null, { params: params })
+    // let header: HttpHeaders = new HttpHeaders();
+    // // header = header.set('Accept', 'application/json');
+    // header = header.set('rejectUnauthorized', 'false');
+
+    return this.http.post<JWTToken>(this.apiBaseUrl + 'api/auth/login', null, { params: params })//, headers: header
       .pipe(
         map(
           (resp: JWTToken) => {

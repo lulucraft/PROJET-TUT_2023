@@ -3,7 +3,6 @@ package fr.nepta.cloud;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.sshd.sftp.client.SftpClient.DirEntry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +12,7 @@ import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.file.remote.session.CachingSessionFactory;
-import org.springframework.integration.file.remote.session.SessionFactory;
-import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
+import org.springframework.integration.ftp.session.DefaultFtpSessionFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 @EnableIntegration
@@ -45,23 +42,23 @@ public class SFTPConfig {
 
 	@Bean
 	@Order(0)
-	SessionFactory<DirEntry> sftpSessionFactory() {
-		DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
+//	SessionFactory<DirEntry> sftpSessionFactory() {
+	DefaultFtpSessionFactory sftpSessionFactory() {
+		DefaultFtpSessionFactory factory = new DefaultFtpSessionFactory();
+//		DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
 		factory.setHost(sftpHost);
 		factory.setPort(sftpPort);
-		factory.setUser(sftpUser);
+		factory.setUsername(sftpUser);
+//		factory.setUser(sftpUser);
 		if (sftpPrivateKey != null) {
-			factory.setPrivateKey(sftpPrivateKey);
-			factory.setPrivateKeyPassphrase(sftpPrivateKeyPassphrase);
+//			factory.setPrivateKey(sftpPrivateKey);
+//			factory.setPrivateKeyPassphrase(sftpPrivateKeyPassphrase);
 		} else {
 			factory.setPassword(sftpPasword);
 		}
-		factory.setAllowUnknownKeys(true);
-//		System.err.println(sftpPrivateKey);
-//		System.err.println(sftpPrivateKeyPassphrase);
-//		System.err.println(sftpPasword);
-		System.err.println(sftpRemoteDirectory);
-		return new CachingSessionFactory<DirEntry>(factory);
+//		factory.setAllowUnknownKeys(true);
+//		return new CachingSessionFactory<DirEntry>(factory);
+		return factory;
 	}
 
 	//	public void upload() throws IOException {

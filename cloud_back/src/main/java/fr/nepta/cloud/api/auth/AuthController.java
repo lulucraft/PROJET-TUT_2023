@@ -1,6 +1,7 @@
 package fr.nepta.cloud.api.auth;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +38,13 @@ import fr.nepta.cloud.service.UserService;
 import fr.nepta.cloud.service.UserShareRightService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 @RequiredArgsConstructor @Log4j2
-//@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"*"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
+@CrossOrigin(origins = {"https://tuxit.site/", "51.79.109.241"}, maxAge = 3600, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT })
 @RestController
 @RequestMapping("api/auth/")
 public class AuthController {
@@ -101,27 +103,32 @@ public class AuthController {
 		}
 	}
 
+	@Getter @Setter
+	private static class RegisterUser {
+		private String email, username, password;
+	}
+
 	@PostMapping(value = "register", consumes = "application/json")
-	public String register(@RequestBody User user) {
-		if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+	public String register(@RequestBody RegisterUser regUser) {
+		if (regUser.getUsername() == null || regUser.getUsername().trim().isEmpty()) {
 			throw new IllegalStateException("Nom d'utilisateur manquant");
 		}
 
-		if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+		if (regUser.getPassword() == null || regUser.getPassword().trim().isEmpty()) {
 			throw new IllegalStateException("Mot de passe manquant");
 		}
 
-		boolean userExists = us.getUser(user.getUsername()) != null;
+		boolean userExists = us.getUser(regUser.getUsername()) != null;
 		if (userExists) {
 			throw new IllegalStateException("Ce nom d'utilisateur est déjà utilisé");
 		}
 
 		// User creation date
-		user.setCreationDate(new Date());
+		//user.setCreationDate(new Date());
 
-		us.saveUser(user);
+		User user = us.saveUser(new User(null, null, null, regUser.getEmail(), regUser.getUsername(), regUser.getPassword(), new Date(), false, true, null, null, new ArrayList<>(), null, null));
 		// Add user role to User by default
-		us.addRoleToUser(user.getUsername(), "USER");
+		us.addRoleToUser(regUser.getUsername(), "USER");
 
 		return user.getId().toString();
 	}

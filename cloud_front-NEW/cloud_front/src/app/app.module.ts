@@ -23,7 +23,7 @@ import { UserComponent } from './views/user/user.component';
 import { AccountComponent } from './views/account/account.component';
 import { FilesComponent } from './views/user/files/files.component';
 import { PricingComponent } from './shared/pricing/pricing.component';
-import { CheckoutComponent } from './checkout/checkout.component';
+import { CheckoutComponent } from './views/user/checkout/checkout.component';
 import { ResetPasswordComponent } from './shared/auth/reset-password/reset-password.component';
 import { NgxPayPalModule } from 'ngx-paypal';
 import { CgvComponent } from './shared/cgv/cgv.component';
@@ -31,6 +31,7 @@ import { OTPloginComponent } from './shared/auth/otplogin/otplogin.component';
 import { EditPasswordComponent } from './shared/auth/edit-password/edit-password.component';
 import { UsersComponent } from './views/user/users/users.component';
 import { EnterUserComponent } from './views/user/users/enter-user/enter-user.component';
+import { CguComponent } from './shared/cgu/cgu.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -57,7 +58,8 @@ registerLocaleData(localeFr, 'fr-FR');
     OTPloginComponent,
     EditPasswordComponent,
     UsersComponent,
-    EnterUserComponent
+    EnterUserComponent,
+    CguComponent
   ],
   imports: [
     BrowserModule,

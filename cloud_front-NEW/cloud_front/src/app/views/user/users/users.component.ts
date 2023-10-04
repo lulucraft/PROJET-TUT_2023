@@ -59,7 +59,6 @@ export class UsersComponent {
       // data: { username: 'test' },
     });
     matDialogRef.afterClosed().subscribe(result => {
-      console.log(result)
       window.location.reload();
     })
   }

@@ -14,13 +14,13 @@
       <button mat-button *ngIf="isAuthenticated()" (click)="account()"><img src="assets/images/user.svg" width="24"><span>{{getUserName()}}</span></button>
     </li>
 
-    <!-- Admin Comptes -->
-    <!-- <li *ngIf="isAuthenticated() && isAdmin()">
-      <button mat-button (click)="adminComptes()">
-        <mat-icon>admin_panel_settings</mat-icon>
-        <span>Gestion Comptes</span>
+    <!-- Login -->
+    <li *ngIf="!isAuthenticated()">
+      <button mat-button (click)="login()">
+        <mat-icon>login</mat-icon>
+        <span>Se connecter</span>
       </button>
-    </li> -->
+    </li>
 
     <!-- Fichiers -->
     <li *ngIf="isAuthenticated() && hasOffer()">

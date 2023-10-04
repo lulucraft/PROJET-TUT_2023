@@ -2,13 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Navigation, Params, Router } from '@angular/router';
 import { ICancelCallbackData, ICreateOrderRequest, IOnApproveCallbackActions, IOnApproveCallbackData, IPayPalConfig } from 'ngx-paypal';
-import { Country } from '../models/country';
-import { Offer } from '../models/offer';
-import { AuthService } from '../services/auth.service';
-import { DataService, countries } from '../services/data.service';
+import { Country } from '../../../models/country';
+import { Offer } from '../../../models/offer';
+import { AuthService } from '../../../services/auth.service';
+import { DataService, countries } from '../../../services/data.service';
 import { MatStepper } from '@angular/material/stepper';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { JWTToken } from '../models/jwt-token';
+import { JWTToken } from '../../../models/jwt-token';
 
 @Component({
   selector: 'app-checkout',
@@ -62,7 +62,7 @@ export class CheckoutComponent implements OnInit {
       let id = params['id'];
 
       if (!id) {
-        alert("Vous n'avez pas sélectionné d'offre")
+        alert("Vous n'avez pas sélectionné d'offre");
         // Redirect to home if no offer selected
         this.router.navigate(['/offer']);
         return;
@@ -105,7 +105,7 @@ export class CheckoutComponent implements OnInit {
         },
         error: (err: any) => {
           console.error(err);
-          alert("Erreur lors de la récupération de l'offre " + id);
+          this.snackBar.open("Erreur lors de la récupération de l'offre " + id, '', { duration: 1700, horizontalPosition: 'right', verticalPosition: 'top', panelClass: ['snack-bar-container', 'warn'] });
         }
       });
 

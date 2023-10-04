@@ -43,7 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor @Slf4j
 //@CrossOrigin(origins = "https://intranet.tracroute.lan/", maxAge = 3600)
-@CrossOrigin(origins = {"http://localhost:4200/"}, maxAge = 4800, methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
+//"192.168.10.2","192.168.10.3", "192.168.10.4"
+@CrossOrigin(origins = {"https://tuxit.site/", "51.79.109.241"}, maxAge = 4800, allowCredentials = "false", methods = { RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
 @RequestMapping("api/user/")
 public class UserController {
@@ -238,7 +239,8 @@ public class UserController {
 
 		return null;
 	}
-	
+
+	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "file/checkhash")
 	public byte[] checkHash(@RequestParam(name = "file_id") long fileId) throws IllegalAccessException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -404,7 +406,6 @@ public class UserController {
 	}
 
 	// OFFERS
-	@RolesAllowed({"USER","ADMIN"})
 	@GetMapping(value = "offers")
 	public Collection<Offer> getOffers() {
 		return os.getOffers();
@@ -449,6 +450,7 @@ public class UserController {
 	//		return users;
 	//	}
 
+	@RolesAllowed({"USER","ADMIN"})
 	@PostMapping(value = "darkmode")
 	public void changeDarkMode(@RequestBody boolean darkModeEnabled) throws Exception {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
